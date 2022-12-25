@@ -30,7 +30,7 @@ public class Game : MonoBehaviour
         for (int a = 0; a < numLeds; a++)
             ledsData.Add(Color.black);
         levelsManager = new LevelsManager();
-        levelsManager.Init(numLeds);
+        levelsManager.Init(numLeds, GetFrameRate());
         Loop();
     }
     void Loop()
@@ -41,14 +41,17 @@ public class Game : MonoBehaviour
         characters[1].OnUpdate(inputs.character2_speed);
         CheckCollision();
         SendData();
-        Invoke("Loop", 1 / (float)framerate);
+        Invoke("Loop", GetFrameRate());
     }
-
+    public float GetFrameRate()
+    {
+        return 1 / (float)framerate;
+    }
     void SetData()
     {
         for (int a = 0; a < numLeds; a++)
             ledsData[a] = Color.black;
-        foreach (LevelZone levelzone in levelsManager.all)
+        foreach (LevelZone levelzone in levelsManager.GetLevelZones())
         {
             int ledID = levelzone.from;
             Color color = levelzone.GetColor();
@@ -72,7 +75,7 @@ public class Game : MonoBehaviour
     {
         for (int ledID = from; ledID < to; ledID++)
         {
-            if (ledID > ledsData.Count) return;
+            if (ledID > ledsData.Count-1) return;
             else if (ledID < 0) return;
             ledsData[ledID] = color;
         }
@@ -88,7 +91,7 @@ public class Game : MonoBehaviour
         {
             character.color = character.originalColor;
             ledID = character.ledId;
-            foreach (LevelZone levelzone in levelsManager.all)
+            foreach (LevelZone levelzone in levelsManager.GetLevelZones())
             {
                 if (levelzone.IsInsideCurve(ledID))
                 {

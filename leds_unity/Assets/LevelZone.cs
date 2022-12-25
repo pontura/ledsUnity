@@ -14,10 +14,11 @@ public class LevelZone
     LevelsManager levelsManager;
     public bool ready;
     bool isMaster;
-
-    public void Init(int id, LevelsManager levelsManager, float pos, int length, Color color, int numLeds)
+    float frameRate;
+    public void Init(int id, LevelsManager levelsManager, float pos, int length, Color color, int numLeds, float frameRate)
     {
-        isMaster = id == 0;
+        this.frameRate = frameRate;
+         isMaster = id == 0;
         this.levelsManager = levelsManager;
         this.pos = pos;
         this.length = length;
@@ -25,9 +26,35 @@ public class LevelZone
         this.color = color;
         SetFromAndTo();
     }
+
+    float scale_timer = 0.0f;
+    float move_timer = 0.0f;
+    public void ScaleTo(float nextLength, float seconds)
+    {
+        scale_timer += frameRate / seconds;
+        length = Mathf.Lerp(length, nextLength, Mathf.SmoothStep(0.0f, 1.0f, scale_timer));
+        SetFromAndTo();
+        if (isMaster)
+        {
+            if (Mathf.Abs(length - nextLength) <= 1f)
+                Ready();
+        }
+    }
+    public void Move(float speed, float seconds)
+    {
+        move_timer += frameRate;
+        this.pos += (speed * frameRate);
+        SetFromAndTo();
+        if (isMaster)
+        {
+            if(move_timer > seconds)
+                Ready();
+        }  
+    }
     public void Restart()
     {
-        t = 0.0f;
+        move_timer = 0;
+        scale_timer = 0;
         ready = false;
     }
     public bool IsInsideCurve(int ledID)
@@ -39,27 +66,13 @@ public class LevelZone
     public Color GetColor()
     {
         return color;
-    }
-    public void Move(float speed)
-    {
-        this.pos += (speed * Time.deltaTime);
-        SetFromAndTo();
-    }
+    }   
     void Ready()
     {
-        t = 0.0f;
+        move_timer = 0;
+        scale_timer = 0;
         ready = true;
         levelsManager.OnNextLevel();
-    }
-   
-    float t = 0.0f;
-    public void ScaleTo(float nextLength, float seconds)
-    {
-        t += Time.deltaTime / seconds;
-        length  = Mathf.Lerp(length, nextLength, Mathf.SmoothStep(0.0f, 1.0f, t));
-        SetFromAndTo();
-        if (isMaster && Mathf.Abs(length - nextLength) <= 2f)
-            Ready();
     }
     void SetFromAndTo()
     {
