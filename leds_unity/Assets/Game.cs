@@ -22,7 +22,7 @@ public class Game : MonoBehaviour
             if (a == 0)
                 ch.Init(numLeds, 0, Color.blue, 3);
             else
-                ch.Init(numLeds, 0, Color.green, 3);
+                ch.Init(numLeds, numLeds/2, Color.green, 3);
             characters.Add(ch);
         }
         view.Init(numLeds);
@@ -35,10 +35,11 @@ public class Game : MonoBehaviour
     }
     void Loop()
     {
+        float deltaTime = Time.deltaTime;
         SetData();
-        levelsManager.OnUpdate();
-        characters[0].OnUpdate(inputs.character1_speed);
-        characters[1].OnUpdate(inputs.character2_speed);
+        levelsManager.OnUpdate(deltaTime);
+        characters[0].OnUpdate(inputs.character1_speed, deltaTime);
+        characters[1].OnUpdate(inputs.character2_speed, deltaTime);
         CheckCollision();
         SendData();
         Invoke("Loop", GetFrameRate());

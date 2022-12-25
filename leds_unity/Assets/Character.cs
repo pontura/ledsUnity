@@ -31,17 +31,17 @@ public class Character
         this.ledId = _ledID;
         pos = ledId;
     }
-    public void OnUpdate(float _speed)
+    public void OnUpdate(float _speed, float deltaTime)
     {
         if (state == 1 || state == 2)
-            Move(_speed);
+            Move(_speed, deltaTime);
         else if (state == 3)
             CheckToBeBack();
     }
     float lastSpeed;
-    void Move(float _speed)
+    void Move(float _speed, float deltaTime)
     {
-        lastSpeed = Mathf.Lerp(lastSpeed, _speed*maxSpeed, Time.deltaTime * 40);
+        lastSpeed = Mathf.Lerp(lastSpeed, _speed*maxSpeed, deltaTime * 40);
         this.speed = lastSpeed;
         if (state == 1)
         {

@@ -10,6 +10,7 @@ public class LevelsManager : MonoBehaviour
     int levelID;
     int numLeds;
     float frameRate;
+    int lastLength = 150;
 
     public class LevelData
     {
@@ -31,25 +32,40 @@ public class LevelsManager : MonoBehaviour
     void SetLevels()
     {
         levels = new List<LevelData>();
-        AddZones(   150, new Color[] { Color.blue, Color.green });
-        AddLevel(150,   2,      0,      5);
-        AddLevel(2,     60,     0,      5);
-        AddLevel(60,    2,      0,      3);
-        AddLevel(2,     150,    0,      2);
-        AddLevel(150,   100,    0,      2);
-        AddLevel(100,   100,    80,      5);
-        AddLevel(100,   100,   -80,      5);
+        AddZones(lastLength, new Color[] { Color.blue, Color.green, Color.red });
+        AddLevel(2, 0, 5);
+        AddLevel(60, 0, 5);
+        AddLevel(2, 0, 3);
+        AddLevel(145, 0, 2);
+        AddLevel(70, 0, 2);
+        AddLevel(70, 40, 3);
+        AddLevel(2, 0, 2);
+        AddLevel(70, 0, 2);
+        AddLevel(70, -40, 3);
+        AddLevel(100, 0, 2); 
+
+        AddLevel(100, 60, 5);
+        AddLevel(125, 0, 1);
+        AddLevel(100, 0, 1);
+        AddLevel(100, -60, 5);
+
+        AddLevel(105, 80, 2);
+        AddLevel(2, 0, 4);
+        AddLevel(125, 0, 2);
+        AddLevel(20, -80, 5);
+
+        AddLevel(2, 0, 2);
 
     }
-    void AddLevel( int initialLength, int nextLength, float speed, int seconds)
+    void AddLevel(int nextLength, float speed, int seconds)
     {
         LevelData lData = new LevelData();
         lData.speed = speed;
-        lData.initialLength = initialLength;
+        lData.initialLength = lastLength;
         lData.nextLength = nextLength;
         lData.seconds = seconds;
-
         levels.Add(lData);
+        lastLength = nextLength;
     }
     
     void AddZones(int initialLength, Color[] colors)
@@ -63,7 +79,7 @@ public class LevelsManager : MonoBehaviour
             all.Add(levelzone);
         }
     }
-    public void OnUpdate()
+    public void OnUpdate(float deltaTime)
     {
         LevelData lData = levels[levelID];
 
@@ -72,12 +88,9 @@ public class LevelsManager : MonoBehaviour
             if(lData.nextLength != lData.initialLength)
             {
                 int nextLength = lData.nextLength;
-                level.ScaleTo(nextLength, lData.seconds);
+                level.ScaleTo(nextLength, lData.seconds, deltaTime);
             }
-            if (lData.speed != 0)
-            {
-                level.Move(lData.speed, lData.seconds);
-            }
+            level.Move(lData.speed, lData.seconds, deltaTime);
         }      
     }
     public void OnNextLevel()
@@ -88,9 +101,7 @@ public class LevelsManager : MonoBehaviour
 
         foreach (LevelZone levelzone in all)
             levelzone.Restart();
-
-        Debug.Log("level:  " + levelID);
-
+        
     }
     public List<LevelZone> GetLevelZones()  { return all; }
     

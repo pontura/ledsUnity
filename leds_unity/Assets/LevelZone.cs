@@ -29,28 +29,36 @@ public class LevelZone
 
     float scale_timer = 0.0f;
     float move_timer = 0.0f;
-    public void ScaleTo(float nextLength, float seconds)
+    public void ScaleTo(float nextLength, float seconds, float deltaTime)
     {
-        scale_timer += frameRate / seconds;
+        scale_timer += deltaTime / seconds;
         length = Mathf.Lerp(length, nextLength, Mathf.SmoothStep(0.0f, 1.0f, scale_timer));
         SetFromAndTo();
         if (isMaster)
         {
             if (Mathf.Abs(length - nextLength) <= 1f)
+            {
                 Ready();
+            }
         }
     }
-    public void Move(float speed, float seconds)
+    public void Move(float speed, float seconds, float deltaTime)
     {
-        move_timer += frameRate;
-        this.pos += (speed * frameRate);
+        move_timer += deltaTime;
+        this.pos += (speed * deltaTime);
+        if (pos > numLeds) pos = 0;
+        if (pos < 0) pos = numLeds;
         SetFromAndTo();
         if (isMaster)
         {
             if(move_timer > seconds)
+            {
                 Ready();
-        }  
+            }
+        }
     }
+
+
     public void Restart()
     {
         move_timer = 0;
@@ -69,6 +77,7 @@ public class LevelZone
     }   
     void Ready()
     {
+        if (ready) return;
         move_timer = 0;
         scale_timer = 0;
         ready = true;
