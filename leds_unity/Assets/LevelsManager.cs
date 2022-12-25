@@ -18,10 +18,9 @@ public class LevelsManager : MonoBehaviour
         public int nextLength;
         public int seconds;
 
-        public void Init(int initialLength, int nextLength, int seconds, Color[] colors)
+        public void Init(int initialLength, int nextLength, int seconds)
         {
             this.initialLength = initialLength;
-            this.colors = colors;
             this.nextLength = nextLength;
             this.seconds = seconds;
         }
@@ -29,24 +28,23 @@ public class LevelsManager : MonoBehaviour
     public void Init(int numLeds)
     {
         all = new List<LevelZone>();
-        SetLevels();
         this.numLeds = numLeds;
         levelID = -1;
+        SetLevels();
         OnNextLevel();
     }
     void SetLevels()
     {
-        levels = new List<LevelData>(); 
-
-        AddLevel(   150, 5,      5,      new Color[] { Color.blue, Color.green });
-        AddLevel(   5, 50,      5,      new Color[] { Color.blue, Color.green });
-        AddLevel(   50, 5,      5,      new Color[] { Color.blue, Color.green });
+        levels = new List<LevelData>();
+        AddZones(50, new Color[] { Color.blue, Color.green });
+        AddLevel(   150, 5,      5);
+        AddLevel(   5, 50,      5);
+        AddLevel(   50, 5,      5);
     }
-    
-    void AddLevel(int initialLength, int nextLength, int seconds, Color[] colors)
+    void AddLevel(int initialLength, int nextLength, int seconds)
     {
         LevelData lData = new LevelData();
-        lData.Init(initialLength, nextLength, seconds, colors);
+        lData.Init(initialLength, nextLength, seconds);
         levels.Add(lData);
     }
     
@@ -82,14 +80,9 @@ public class LevelsManager : MonoBehaviour
         foreach (LevelZone levelzone in all)
             levelzone.Restart();
 
-        InitLevel();
 
         Debug.Log("level:  " + levelID);
 
     }
-    void InitLevel()
-    {
-        LevelData lData = levels[levelID];
-        AddZones(lData.initialLength, lData.colors);
-    }
+    
 }
