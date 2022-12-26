@@ -67,7 +67,9 @@ public class LevelZone
     }
     public bool IsInsideCurve(int ledID)
     {
-        if (ledID > from && ledID < to)
+        if(from<to && ledID > from && ledID < to)
+            return true;
+        else if (from > to && (ledID > from || ledID < to))
             return true;
         return false;
     }

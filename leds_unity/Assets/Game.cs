@@ -11,6 +11,7 @@ public class Game : MonoBehaviour
     float framerate = 30;
     List<Color> ledsData;
     InputsManager inputs;
+    [SerializeField] TextAsset jsonData;
 
     void Start()
     {
@@ -29,8 +30,8 @@ public class Game : MonoBehaviour
         ledsData = new List<Color>();
         for (int a = 0; a < numLeds; a++)
             ledsData.Add(Color.black);
-        levelsManager = new LevelsManager();
-        levelsManager.Init(numLeds, GetFrameRate());
+        levelsManager = GetComponent<LevelsManager>();
+        levelsManager.Init(numLeds, GetFrameRate(), jsonData.text);
         Loop();
     }
     void Loop()
@@ -88,20 +89,22 @@ public class Game : MonoBehaviour
     void CheckCollision()
     {
         int ledID;
+        int id = 0;
         foreach (Character character in characters)
         {
+            id++;
             character.color = character.originalColor;
             ledID = character.ledId;
+
             foreach (LevelZone levelzone in levelsManager.GetLevelZones())
             {
                 if (levelzone.IsInsideCurve(ledID))
                 {
                     Color color = levelzone.GetColor();
-
-                    if (character.color != color)
+                    if (character.originalColor != color)
                     {
                         character.color = Color.white;
-                    } else if (character.color == color)
+                    } else if (character.originalColor == color)
                     {
                         character.color = Color.black;
                     }

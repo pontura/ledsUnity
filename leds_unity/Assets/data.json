@@ -1,0 +1,40 @@
+{
+	"areas":
+	[
+		{	
+			"length": 150,
+			"colors": 
+			 [
+				{ 
+					"color": "blue",
+					"pos": 0
+				},
+				{ 
+					"color": "red",
+					"pos": 150
+				}
+			 ],
+			 "levels":
+			 [
+				 { "nextLength":2, "speed": 0, "seconds":5 },
+				 { "nextLength":60, "speed": 0, "seconds":5 },
+				 { "nextLength":2, "speed": 0, "seconds":3 },
+				 { "nextLength":145, "speed": 0, "seconds":2 },
+				 { "nextLength":70, "speed": 0, "seconds":2 },
+				 { "nextLength":70, "speed": 40, "seconds":3 },		 
+				 { "nextLength":2, "speed": 0, "seconds":2 },
+				 { "nextLength":70, "speed": 0, "seconds":2 },
+				 { "nextLength":70, "speed": -40, "seconds":3 },
+				 { "nextLength":100, "speed": 0, "seconds":2 },
+				 { "nextLength":100, "speed": 0, "seconds":5 },
+				 { "nextLength":125, "speed": 0, "seconds":1 },
+				 { "nextLength":100, "speed": 0, "seconds":1 },
+				 { "nextLength":100, "speed": -60, "seconds":5 },
+				 { "nextLength":2, "speed": 80, "seconds":2 },
+				 { "nextLength":125, "speed": 0, "seconds":4 },
+				 { "nextLength":20, "speed": -80, "seconds":2 },
+				 { "nextLength":2, "speed": 0, "seconds":2 }
+			]
+		}
+	]
+}

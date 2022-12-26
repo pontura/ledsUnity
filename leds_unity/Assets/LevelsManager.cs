@@ -8,53 +8,59 @@ public class LevelsManager : MonoBehaviour
     List<LevelData> levels;
     List<LevelZone> all;
     int levelID;
+    int areaID;
     int numLeds;
     float frameRate;
     int lastLength = 150;
 
+    public Data allData;
+    [Serializable]
+    public class Data
+    {
+        public List<AreaData> areas;
+    }
+    [Serializable]
+    public class AreaData
+    {
+        public List<ColorData> colors;
+        public List<LevelData> levels;
+        public int length;
+    }
+    [Serializable]
+    public class ColorData
+    {
+        public string color;
+        public int pos;
+    }
+    [Serializable]
     public class LevelData
     {
         public float speed;
         public int initialLength;
-        public Color[] colors;
         public int nextLength;
         public int seconds;
     }
-    public void Init(int numLeds, float frameRate)
+    public void Init(int numLeds, float frameRate, string json)
     {
         this.frameRate = frameRate;
         all = new List<LevelZone>();
         this.numLeds = numLeds;
         levelID = -1;
-        SetLevels();
+        SetLevels(json);
         OnNextLevel();
     }
-    void SetLevels()
+    void SetLevels(string json)
     {
+        allData = JsonUtility.FromJson<Data>(json);
+        Debug.Log(json);
         levels = new List<LevelData>();
-        AddZones(lastLength, new Color[] { Color.blue, Color.green, Color.red });
-        AddLevel(2, 0, 5);
-        AddLevel(60, 0, 5);
-        AddLevel(2, 0, 3);
-        AddLevel(145, 0, 2);
-        AddLevel(70, 0, 2);
-        AddLevel(70, 40, 3);
-        AddLevel(2, 0, 2);
-        AddLevel(70, 0, 2);
-        AddLevel(70, -40, 3);
-        AddLevel(100, 0, 2); 
+        AreaData areaData = allData.areas[areaID];
+        AddZones(areaData);
 
-        AddLevel(100, 60, 5);
-        AddLevel(125, 0, 1);
-        AddLevel(100, 0, 1);
-        AddLevel(100, -60, 5);
-
-        AddLevel(105, 80, 2);
-        AddLevel(2, 0, 4);
-        AddLevel(125, 0, 2);
-        AddLevel(20, -80, 5);
-
-        AddLevel(2, 0, 2);
+        foreach(LevelData lData in areaData.levels)
+        {
+            AddLevel(lData.nextLength, lData.speed, lData.seconds);
+        }
 
     }
     void AddLevel(int nextLength, float speed, int seconds)
@@ -68,16 +74,27 @@ public class LevelsManager : MonoBehaviour
         lastLength = nextLength;
     }
     
-    void AddZones(int initialLength, Color[] colors)
+    void AddZones(AreaData areaData)
     {
         all = new List<LevelZone>();
-        float qty = colors.Length;
+        float qty = areaData.colors.Count;
         for (int a = 0; a < qty; a++)
         {
             LevelZone levelzone = new LevelZone();
-            levelzone.Init(a, this, a * (numLeds / qty), initialLength, colors[a], numLeds, frameRate);
+            Color color = GetColor(areaData.colors[a].color);
+            levelzone.Init(a, this, a * (numLeds / qty), areaData.length, color, numLeds, frameRate);
             all.Add(levelzone);
         }
+    }
+    Color GetColor(string colorName)
+    {
+        switch (colorName)
+        {
+            case "red": return Color.red;
+            case "green": return Color.green;
+            case "blue": return Color.blue;
+        }
+        return Color.black;
     }
     public void OnUpdate(float deltaTime)
     {

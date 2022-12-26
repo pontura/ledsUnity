@@ -35,9 +35,10 @@ public class Xcalectric : MonoBehaviour
     }
     void Loop()
     {
+        float deltaTime = Time.deltaTime;
         SetData();
-        characters[0].OnUpdate(inputs.character1_speed);
-        characters[1].OnUpdate(inputs.character2_speed);
+        characters[0].OnUpdate(inputs.character1_speed, deltaTime);
+        characters[1].OnUpdate(inputs.character2_speed, deltaTime);
         CheckCollision();
         SendData();
         Invoke("Loop", 1 / (float)framerate);
