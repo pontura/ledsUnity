@@ -32,9 +32,9 @@ public class Game : MonoBehaviour
             ledsData.Add(Color.black);
         levelsManager = GetComponent<LevelsManager>();
         levelsManager.Init(numLeds, GetFrameRate(), jsonData.text);
-        Loop();
+       // Loop();
     }
-    void Loop()
+    void Update()
     {
         float deltaTime = Time.deltaTime;
         SetData();
@@ -43,11 +43,12 @@ public class Game : MonoBehaviour
         characters[1].OnUpdate(inputs.character2_speed, deltaTime);
         CheckCollision();
         SendData();
-        Invoke("Loop", GetFrameRate());
+      //  Invoke("Loop", GetFrameRate());
     }
     public float GetFrameRate()
     {
-        return 1 / (float)framerate;
+        return Time.deltaTime;
+       // return 1 / (float)framerate;
     }
     void SetData()
     {
@@ -63,7 +64,7 @@ public class Game : MonoBehaviour
             {
                 ColorizeZone(from, to, color);
             }
-            else
+            else if (to != from)
             {
                 ColorizeZone(from, numLeds, color);
                 ColorizeZone(0, to, color);

@@ -10,6 +10,7 @@ public class LevelZone
     int numLeds;
     float pos;
     float scaleSpeed;
+    float initialLength;
     float length;
     LevelsManager levelsManager;
     public bool ready;
@@ -21,6 +22,7 @@ public class LevelZone
          isMaster = id == 0;
         this.levelsManager = levelsManager;
         this.pos = pos;
+        this.initialLength = length;
         this.length = length;
         this.numLeds = numLeds;
         this.color = color;
@@ -32,26 +34,23 @@ public class LevelZone
     public void ScaleTo(float nextLength, float seconds, float deltaTime)
     {
         scale_timer += deltaTime / seconds;
-        length = Mathf.Lerp(length, nextLength, Mathf.SmoothStep(0.0f, 1.0f, scale_timer));
-        SetFromAndTo();
-        if (isMaster)
-        {
-            if (Mathf.Abs(length - nextLength) <= 1f)
-            {
-                Ready();
-            }
-        }
+        length = Mathf.Lerp(initialLength, nextLength, Mathf.SmoothStep(0.0f, 1.0f, scale_timer));
+       
     }
     public void Move(float speed, float seconds, float deltaTime)
     {
-        move_timer += deltaTime;
         this.pos += (speed * deltaTime);
         if (pos > numLeds) pos = 0;
         if (pos < 0) pos = numLeds;
+       
+    }
+    public void Process(float seconds, float deltaTime)
+    {
+        move_timer += deltaTime;
         SetFromAndTo();
         if (isMaster)
         {
-            if(move_timer > seconds)
+            if (move_timer > seconds)
             {
                 Ready();
             }
@@ -59,8 +58,9 @@ public class LevelZone
     }
 
 
-    public void Restart()
+    public void Restart(float initialLength)
     {
+        this.initialLength = initialLength;
         move_timer = 0;
         scale_timer = 0;
         ready = false;

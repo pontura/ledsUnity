@@ -3,20 +3,42 @@
 	[
 		{	
 			"length": 150,
-			"colors": 
+			"zones": 
 			 [
 				{ 
 					"color": "blue",
 					"pos": 0
 				},
 				{ 
-					"color": "red",
-					"pos": 150
+					"color": "green",
+					"pos": 0.5
 				}
 			 ],
 			 "levels":
 			 [
-				 { "nextLength":2, "speed": 0, "seconds":5 },
+				 { "nextLength":2, "speed": 0, "seconds":5 }
+			]
+		},
+		{	
+			"length": 1,
+			"zones":[{}],
+			"levels": [ { "seconds":2 } ]
+		},
+		{	
+			"length": 20,
+			"zones": 
+			 [
+				{ 
+					"color": "red",
+					"pos": 0.25
+				},
+				{ 
+					"color": "red",
+					"pos": 0.75
+				}
+			 ],
+			 "levels":
+			 [
 				 { "nextLength":60, "speed": 0, "seconds":5 },
 				 { "nextLength":2, "speed": 0, "seconds":3 },
 				 { "nextLength":145, "speed": 0, "seconds":2 },
