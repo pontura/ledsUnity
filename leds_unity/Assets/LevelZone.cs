@@ -44,7 +44,7 @@ public class LevelZone
         if (pos < 0) pos = numLeds;
        
     }
-    public void Process(float seconds, float deltaTime)
+    public void Process(float seconds, string status, float deltaTime)
     {
         move_timer += deltaTime;
         SetFromAndTo();
@@ -55,6 +55,10 @@ public class LevelZone
                 Ready();
             }
         }
+        if (status == "safe")
+            color.a = 0.45f;
+        else
+            color.a = 1;
     }
 
 

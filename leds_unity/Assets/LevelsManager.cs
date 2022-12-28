@@ -13,6 +13,7 @@ public class LevelsManager : MonoBehaviour
     int numLeds;
     float frameRate;
     int lastLength = 150;
+    string lastStatus = "";
 
     public Data allData;
     [Serializable]
@@ -36,6 +37,7 @@ public class LevelsManager : MonoBehaviour
     [Serializable]
     public class LevelData
     {
+        public string status; //"safe": zona libre con transparencia // "status": "full" hace daño
         public float speed;
         public int initialLength;
         public int nextLength;
@@ -55,14 +57,23 @@ public class LevelsManager : MonoBehaviour
         Debug.Log(json);
         levels = new List<LevelData>(); 
     }
-    void AddLevel(int nextLength, float speed, int seconds)
+    void AddLevel(int nextLength, float speed, int seconds, string status)
     {
+        nextLength = nextLength * (numLeds / 100); //numLeds/100 normaliza de 0 a 100 el scalesss
         LevelData lData = new LevelData();
         lData.speed = speed;
         lData.initialLength = lastLength;
+
+        if (status == "")
+            lData.status = lastStatus;
+        else
+            lData.status = status;
+
         lData.nextLength = nextLength;
         lData.seconds = seconds;
         levels.Add(lData);
+        
+        lastStatus = status;
         lastLength = nextLength;
     }
     
@@ -84,7 +95,7 @@ public class LevelsManager : MonoBehaviour
         levels = new List<LevelData>();
         foreach (LevelData lData in areaData.levels)
         {
-            AddLevel(lData.nextLength, lData.speed, lData.seconds);
+            AddLevel(lData.nextLength, lData.speed, lData.seconds, lData.status);
         }
         activeLevelData = levels[0];
         areaID++;
@@ -113,7 +124,7 @@ public class LevelsManager : MonoBehaviour
         if (activeLevelData.speed > 0)
             level.Move(activeLevelData.speed, activeLevelData.seconds, deltaTime);
 
-        level.Process(activeLevelData.seconds, deltaTime);
+        level.Process(activeLevelData.seconds, activeLevelData.status, deltaTime);
     }
     LevelData activeLevelData;
     public void OnNextLevel()

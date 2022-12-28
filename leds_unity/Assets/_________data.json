@@ -2,7 +2,7 @@
 	"areas":
 	[
 		{	
-			"length": 150,
+			"length": 50,
 			"zones": 
 			 [
 				{ 
@@ -16,16 +16,16 @@
 			 ],
 			 "levels":
 			 [
-				 { "nextLength":2, "speed": 0, "seconds":5 }
+				 { "nextLength":2, "speed": 0, "seconds":3 }
 			]
 		},
 		{	
 			"length": 1,
 			"zones":[{}],
-			"levels": [ { "seconds":2 } ]
+			"levels": [ { "seconds":1 } ]
 		},
 		{	
-			"length": 20,
+			"length": 10,
 			"zones": 
 			 [
 				{ 
@@ -39,23 +39,46 @@
 			 ],
 			 "levels":
 			 [
-				 { "nextLength":60, "speed": 0, "seconds":5 },
-				 { "nextLength":2, "speed": 0, "seconds":3 },
-				 { "nextLength":145, "speed": 0, "seconds":2 },
-				 { "nextLength":70, "speed": 0, "seconds":2 },
-				 { "nextLength":70, "speed": 40, "seconds":3 },		 
-				 { "nextLength":2, "speed": 0, "seconds":2 },
-				 { "nextLength":70, "speed": 0, "seconds":2 },
-				 { "nextLength":70, "speed": -40, "seconds":3 },
-				 { "nextLength":100, "speed": 0, "seconds":2 },
-				 { "nextLength":100, "speed": 0, "seconds":5 },
-				 { "nextLength":125, "speed": 0, "seconds":1 },
-				 { "nextLength":100, "speed": 0, "seconds":1 },
-				 { "nextLength":100, "speed": -60, "seconds":5 },
-				 { "nextLength":2, "speed": 80, "seconds":2 },
-				 { "nextLength":125, "speed": 0, "seconds":4 },
-				 { "nextLength":20, "speed": -80, "seconds":2 },
-				 { "nextLength":2, "speed": 0, "seconds":2 }
+				 { "nextLength":20, "speed": 0, "seconds":3, "status": "safe" },
+				 { "nextLength":1, "speed": -30, "seconds":3, "status": "full" },
+				 { "nextLength":20, "speed": 30, "seconds":3 },
+				 { "nextLength":25, "speed": 60, "seconds":3 },		 
+				 { "nextLength":1, "speed": 0, "seconds":1 },
+				 { "nextLength":25, "speed": -70, "seconds":5 },
+				 { "nextLength":35, "speed": 0, "seconds":1 },
+				 { "nextLength":30, "speed": 70, "seconds":3 },
+				 { "nextLength":1, "speed": 80, "seconds":2 },
+				 { "nextLength":35, "speed": 0, "seconds":3 },
+				 { "nextLength":5, "speed": -100, "seconds":2 },
+				 { "nextLength":1, "speed": 0, "seconds":2 }	
+			]
+		},
+		{	
+			"length": 1,
+			"zones":[{}],
+			"levels": [ { "seconds":1 } ]
+		},
+		{	
+			"length": 10,
+			"zones": 
+			 [
+				{ 
+					"color": "red",
+					"pos": 0
+				},
+				{ 
+					"color": "red",
+					"pos": 0.33
+				},
+				{ 
+					"color": "red",
+					"pos": 0.66
+				}
+			 ],
+			 "levels":
+			 [
+				 { "nextLength":20, "speed": 0, "seconds":3, "status": "safe" },
+				 { "nextLength":2, "speed": -100, "seconds":4, "status": "full" }
 			]
 		}
 	]
