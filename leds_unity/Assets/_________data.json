@@ -40,16 +40,19 @@
 			 "levels":
 			 [
 				 { "nextLength":20, "speed": 0, "seconds":3, "status": "safe" },
-				 { "nextLength":1, "speed": -30, "seconds":3, "status": "full" },
-				 { "nextLength":20, "speed": 30, "seconds":3 },
-				 { "nextLength":25, "speed": 60, "seconds":3 },		 
-				 { "nextLength":1, "speed": 0, "seconds":1 },
-				 { "nextLength":25, "speed": -70, "seconds":5 },
-				 { "nextLength":35, "speed": 0, "seconds":1 },
-				 { "nextLength":30, "speed": 70, "seconds":3 },
-				 { "nextLength":1, "speed": 80, "seconds":2 },
-				 { "nextLength":35, "speed": 0, "seconds":3 },
-				 { "nextLength":5, "speed": -100, "seconds":2 },
+				 { "nextLength":2, "speed": -30, "seconds":4, "status": "full" },
+				 { "nextLength":10, "speed": 0, "seconds":1 },
+				 { "nextLength":25, "speed": 30, "seconds":4 },
+				 { "nextLength":2, "speed": 0, "seconds":1 },
+				 { "nextLength":25, "speed": -40, "seconds":2 },
+				 { "nextLength":25, "speed": 0, "seconds":1, "status": "safe" },
+				 { "nextLength":35, "speed": 70, "seconds":5, "status": "full"},
+				 { "nextLength":5, "speed": 0, "seconds":1, "status": "safe" },
+				 { "nextLength":35, "speed": 70, "seconds":7, "status": "full" },
+				 { "nextLength":1, "speed": 80, "seconds":2 },				 
+				 { "nextLength":40, "speed": 0, "seconds":3, "status": "safe" },
+				 { "nextLength":45, "speed": 0, "seconds":1, "status": "full" },
+				 { "nextLength":1, "speed": -70, "seconds":5, "status": "full" },
 				 { "nextLength":1, "speed": 0, "seconds":2 }	
 			]
 		},
@@ -59,7 +62,7 @@
 			"levels": [ { "seconds":1 } ]
 		},
 		{	
-			"length": 10,
+			"length": 2,
 			"zones": 
 			 [
 				{ 

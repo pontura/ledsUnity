@@ -86,10 +86,10 @@ public class LevelsManager : MonoBehaviour
         float qty = areaData.zones.Count;
         for (int a = 0; a < qty; a++)
         {
-            print(areaData.length + " " + a);
+            int length = areaData.length * (numLeds / 100); //numLeds/100 normaliza de 0 a 100 el scalesss
             LevelZone levelzone = new LevelZone();
             Color color = GetColor(areaData.zones[a].color);
-            levelzone.Init(a, this, areaData.zones[a].pos*numLeds, areaData.length, color, numLeds, frameRate);
+            levelzone.Init(a, this, areaData.zones[a].pos*numLeds, length, color, numLeds, frameRate);
             allZones.Add(levelzone);
         }
         levels = new List<LevelData>();
@@ -121,7 +121,7 @@ public class LevelsManager : MonoBehaviour
 
         if (activeLevelData.nextLength != activeLevelData.initialLength)
             level.ScaleTo(activeLevelData.nextLength, activeLevelData.seconds, deltaTime);
-        if (activeLevelData.speed > 0)
+        if (activeLevelData.speed != 0)
             level.Move(activeLevelData.speed, activeLevelData.seconds, deltaTime);
 
         level.Process(activeLevelData.seconds, activeLevelData.status, deltaTime);
