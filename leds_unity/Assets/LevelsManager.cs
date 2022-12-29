@@ -42,6 +42,7 @@ public class LevelsManager : MonoBehaviour
         public int initialLength;
         public int nextLength;
         public int seconds;
+        public string ease;
     }
     public void Init(int numLeds, float frameRate, string json)
     {
@@ -57,12 +58,13 @@ public class LevelsManager : MonoBehaviour
         Debug.Log(json);
         levels = new List<LevelData>(); 
     }
-    void AddLevel(int nextLength, float speed, int seconds, string status)
+    void AddLevel(int nextLength, float speed, int seconds, string status, string ease)
     {
         nextLength = nextLength * (numLeds / 100); //numLeds/100 normaliza de 0 a 100 el scalesss
         LevelData lData = new LevelData();
         lData.speed = speed;
         lData.initialLength = lastLength;
+        lData.ease = ease;
 
         if (status == "")
             lData.status = lastStatus;
@@ -95,7 +97,7 @@ public class LevelsManager : MonoBehaviour
         levels = new List<LevelData>();
         foreach (LevelData lData in areaData.levels)
         {
-            AddLevel(lData.nextLength, lData.speed, lData.seconds, lData.status);
+            AddLevel(lData.nextLength, lData.speed, lData.seconds, lData.status, lData.ease);
         }
         activeLevelData = levels[0];
         areaID++;
@@ -120,9 +122,9 @@ public class LevelsManager : MonoBehaviour
      //   Debug.Log("area: " + areaID + "   Level " + levelID + "   nextLength" +  activeLevelData.nextLength + "   initialLength:" +  activeLevelData.initialLength + "    speed:" + activeLevelData.speed + "    seconds:" + activeLevelData.seconds + " level " + level.from + " to:" + level.to);
 
         if (activeLevelData.nextLength != activeLevelData.initialLength)
-            level.ScaleTo(activeLevelData.nextLength, activeLevelData.seconds, deltaTime);
+            level.ScaleTo(activeLevelData.nextLength, activeLevelData.seconds, activeLevelData.ease, deltaTime);
         if (activeLevelData.speed != 0)
-            level.Move(activeLevelData.speed, activeLevelData.seconds, deltaTime);
+            level.Move(activeLevelData.speed, activeLevelData.seconds, activeLevelData.ease, deltaTime);
 
         level.Process(activeLevelData.seconds, activeLevelData.status, deltaTime);
     }

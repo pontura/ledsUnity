@@ -29,28 +29,28 @@ public class LevelZone
         SetFromAndTo();
     }
 
-    float scale_timer = 0.0f;
-    float move_timer = 0.0f;
-    public void ScaleTo(float nextLength, float seconds, float deltaTime)
+    float tweenTimer = 0.0f;
+    float timer = 0.0f;
+    public void ScaleTo(float nextLength, float seconds, string ease, float deltaTime)
     {
-        scale_timer += deltaTime / seconds;
-        length = Mathf.Lerp(initialLength, nextLength, Mathf.SmoothStep(0.0f, 1.0f, scale_timer));
-       
+        float lerpValue = GetValueByTweenInTime(ease, deltaTime, seconds);
+        length = Mathf.Lerp(initialLength, nextLength, lerpValue);       
     }
-    public void Move(float speed, float seconds, float deltaTime)
+    
+    public void Move(float speed, float seconds, string ease, float deltaTime)
     {
-        this.pos += (speed * deltaTime);
+        this.pos += GetValueByTweenInTime(ease, deltaTime, seconds)*(speed/100);
         if (pos > numLeds) pos = 0;
         if (pos < 0) pos = numLeds;
        
     }
     public void Process(float seconds, string status, float deltaTime)
     {
-        move_timer += deltaTime;
+        timer += deltaTime;
         SetFromAndTo();
         if (isMaster)
         {
-            if (move_timer > seconds)
+            if (timer > seconds)
             {
                 Ready();
             }
@@ -65,8 +65,8 @@ public class LevelZone
     public void Restart(float initialLength)
     {
         this.initialLength = initialLength;
-        move_timer = 0;
-        scale_timer = 0;
+        timer = 0;
+        tweenTimer = 0;
         ready = false;
     }
     public bool IsInsideCurve(int ledID)
@@ -84,8 +84,8 @@ public class LevelZone
     void Ready()
     {
         if (ready) return;
-        move_timer = 0;
-        scale_timer = 0;
+        timer = 0;
+        tweenTimer = 0;
         ready = true;
         levelsManager.OnNextLevel();
     }
@@ -102,5 +102,31 @@ public class LevelZone
         if (ledID > numLeds) return ledID - numLeds;
         else if (ledID < 0) return numLeds + ledID;
         return ledID;
+    }
+    float GetValueByTweenInTime(string ease, float deltaTime, float seconds)
+    {
+        float lerpValue = 0.5f;
+        tweenTimer += deltaTime / seconds;
+
+        if (ease == "in")
+            lerpValue = Mathf.SmoothStep(1.0f, 0.0f, tweenTimer);
+        else if (ease == "inout")
+        {
+            if (tweenTimer < 0.5f)
+                lerpValue = Mathf.SmoothStep(0.0f, 1.0f, tweenTimer * 2);
+            else
+                lerpValue = Mathf.SmoothStep(1.0f, 0.0f, ((tweenTimer * 2) - 1));
+        }
+        else if (ease == "outin")
+        {
+            if (tweenTimer < 0.5f)
+                lerpValue = Mathf.SmoothStep(1.0f, 0.0f, tweenTimer * 2);
+            else
+                lerpValue = Mathf.SmoothStep(0.0f, 1.0f, ((tweenTimer * 2) - 1));
+        }
+        else
+            lerpValue = Mathf.SmoothStep(0.0f, 1.0f, tweenTimer);
+
+        return lerpValue;
     }
 }
