@@ -81,14 +81,14 @@ public class LevelsManager : MonoBehaviour
     
     void AddNewArea()
     {
-        lastLength = 0;
         Debug.Log("AddNewArea: " + areaID);
         AreaData areaData = allData.areas[areaID];
+        int length = areaData.length * (numLeds / 100);//numLeds/100 normaliza de 0 a 100 el scalesss
+        lastLength = length;
         allZones = new List<LevelZone>();
         float qty = areaData.zones.Count;
         for (int a = 0; a < qty; a++)
-        {
-            int length = areaData.length * (numLeds / 100); //numLeds/100 normaliza de 0 a 100 el scalesss
+        {             
             LevelZone levelzone = new LevelZone();
             Color color = GetColor(areaData.zones[a].color);
             levelzone.Init(a, this, areaData.zones[a].pos*numLeds, length, color, numLeds, frameRate);
@@ -119,8 +119,6 @@ public class LevelsManager : MonoBehaviour
     }
     void UpdateLevel(LevelZone level, float deltaTime)
     {
-     //   Debug.Log("area: " + areaID + "   Level " + levelID + "   nextLength" +  activeLevelData.nextLength + "   initialLength:" +  activeLevelData.initialLength + "    speed:" + activeLevelData.speed + "    seconds:" + activeLevelData.seconds + " level " + level.from + " to:" + level.to);
-
         if (activeLevelData.nextLength != activeLevelData.initialLength)
             level.ScaleTo(activeLevelData.nextLength, activeLevelData.seconds, activeLevelData.ease, deltaTime);
         if (activeLevelData.speed != 0)
@@ -131,7 +129,6 @@ public class LevelsManager : MonoBehaviour
     LevelData activeLevelData;
     public void OnNextLevel()
     {
-        Debug.Log("OnNextLevel  area: " + areaID + "   Add Level " + levelID);
         levelID++;
         if (levelID > levels.Count - 1)
         {
@@ -142,6 +139,16 @@ public class LevelsManager : MonoBehaviour
         {
             activeLevelData = levels[levelID];
         }
+        Debug.Log("area: " + areaID + 
+            "   Level: " + levelID +
+            "   scaleInit: " + activeLevelData.initialLength +
+            "   scaleTo: " +  activeLevelData.nextLength + 
+            "   speed: " + activeLevelData.speed +
+            "   seconds: " +  activeLevelData.seconds + 
+            "   ease: " + activeLevelData.ease + 
+            "   status: " + activeLevelData.status
+            );
+
         foreach (LevelZone levelzone in allZones)
             levelzone.Restart(activeLevelData.initialLength);
     }

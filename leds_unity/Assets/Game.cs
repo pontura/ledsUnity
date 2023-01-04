@@ -12,9 +12,11 @@ public class Game : MonoBehaviour
     List<Color> ledsData;
     InputsManager inputs;
     [SerializeField] TextAsset jsonData;
+    List<Explotion> explotions;
 
     void Start()
     {
+        explotions = new List<Explotion>();
         inputs = GetComponent<InputsManager>();
         characters = new List<Character>();
         for (int a = 0; a < 2; a++)
@@ -32,17 +34,21 @@ public class Game : MonoBehaviour
             ledsData.Add(Color.black);
         levelsManager = GetComponent<LevelsManager>();
         levelsManager.Init(numLeds, GetFrameRate(), jsonData.text);
-       // Loop();
+        //Invoke("AddExplotion", 5);
     }
+    float deltaTime;
     void Update()
     {
-        float deltaTime = Time.deltaTime;
+        deltaTime = Time.deltaTime;
         SetData();
         levelsManager.OnUpdate(deltaTime);
         characters[0].OnUpdate(inputs.character1_speed, deltaTime);
         characters[1].OnUpdate(inputs.character2_speed, deltaTime);
         CheckCollision();
         SendData();
+        if (Input.GetKeyDown(KeyCode.P))
+            AddExplotion(characters[0].ledId);
+
       //  Invoke("Loop", GetFrameRate());
     }
     public float GetFrameRate()
@@ -71,8 +77,32 @@ public class Game : MonoBehaviour
             }
             
         }
-        foreach (Character ch in characters)
-            ledsData[ch.ledId] = ch.color;
+        foreach (Character character in characters)
+        {
+            ledsData[character.ledId] = character.color;
+            Color c = character.color;
+            foreach (Particle particle in character.trail.all)
+            {
+                if (particle.value > 0 && particle.ledID != character.ledId)
+                {
+                    c.a = particle.value / 255;
+                    ledsData[particle.ledID] = c;
+                }
+            } 
+        }
+        foreach (Explotion explotion in explotions)
+        {
+            if (explotion.on)
+            {
+                Color c = Color.red;
+                explotion.OnUpdate(deltaTime, 500);
+                foreach (Particle particle in explotion.all)
+                {
+                    c.a = particle.value / 255;
+                    ledsData[particle.ledID] = c;
+                }
+            }
+        }
     }
     void ColorizeZone(int from, int to, Color color)
     {
@@ -112,6 +142,23 @@ public class Game : MonoBehaviour
                 }
             }
         }
+    }
+    void AddExplotion(int _ledId)
+    {
+        Debug.Log("AddExplotion " + _ledId);
+        foreach (Explotion e in explotions)
+        {
+            if (!e.on)
+            {
+                Debug.Log("Explotion Restart from pool");
+                e.Init(_ledId);
+                return;
+            }
+        }
+        Debug.Log("New Explotion!");
+        Explotion explotion = new Explotion();
+        explotion.Init(numLeds, _ledId, 50);
+        explotions.Add(explotion);
     }
 
 }

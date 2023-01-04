@@ -15,12 +15,15 @@ public class Character
     float dangerZoneMaxSpeed;
     float originalSpeed;
     float aceleration;
+    public Trail trail;
     //1 move
     //2 in danger
     //3 crash
 
     public void Init(int numLeds, int _ledID, Color _color, float maxSpeed)
     {
+        this.trail = new Trail();
+        trail.Init();
         state = 1;
         this.originalSpeed = maxSpeed;
         this.dangerZoneMaxSpeed = maxSpeed / 2;
@@ -33,6 +36,8 @@ public class Character
     }
     public void OnUpdate(float _speed, float deltaTime)
     {
+        float trail_speed = 1000;
+        trail.OnUpdate(deltaTime, (int)pos, trail_speed);
         if (state == 1 || state == 2)
             Move(_speed, deltaTime);
         else if (state == 3)

@@ -29,23 +29,26 @@ public class LevelZone
         SetFromAndTo();
     }
 
-    float tweenTimer = 0.0f;
-    float timer = 0.0f;
+    float tweenTimer = 0.0f; // de cero a uno siempre:
+    float timer = 0.0f; // tiempo real
+
     public void ScaleTo(float nextLength, float seconds, string ease, float deltaTime)
     {
-        float lerpValue = GetValueByTweenInTime(ease, deltaTime, seconds);
-        length = Mathf.Lerp(initialLength, nextLength, lerpValue);       
+        float lerpValue = GetValueByTweenInTime(ease, deltaTime, seconds, true);
+        length = Mathf.Lerp(initialLength, nextLength, lerpValue);
+        //if (isMaster) Debug.Log(length + " lerp: " + lerpValue + "   tweenTimer: " + tweenTimer + "     from-to" + initialLength + ":" + nextLength + "      ease" + ease);
     }
     
     public void Move(float speed, float seconds, string ease, float deltaTime)
     {
-        this.pos += GetValueByTweenInTime(ease, deltaTime, seconds)*(speed/100);
+        this.pos += GetValueByTweenInTime(ease, deltaTime, seconds, false)*(speed/100); 
         if (pos > numLeds) pos = 0;
         if (pos < 0) pos = numLeds;
        
     }
     public void Process(float seconds, string status, float deltaTime)
     {
+        tweenTimer += deltaTime / seconds;
         timer += deltaTime;
         SetFromAndTo();
         if (isMaster)
@@ -103,30 +106,25 @@ public class LevelZone
         else if (ledID < 0) return numLeds + ledID;
         return ledID;
     }
-    float GetValueByTweenInTime(string ease, float deltaTime, float seconds)
-    {
-        float lerpValue = 0.5f;
-        tweenTimer += deltaTime / seconds;
-
-        if (ease == "in")
-            lerpValue = Mathf.SmoothStep(1.0f, 0.0f, tweenTimer);
-        else if (ease == "inout")
+    float GetValueByTweenInTime(string ease, float deltaTime, float seconds, bool normalized) // normalized va de 0 a 1 siempre
+    {      
+        if (ease == "inout")
         {
-            if (tweenTimer < 0.5f)
-                lerpValue = Mathf.SmoothStep(0.0f, 1.0f, tweenTimer * 2);
+            if (normalized)
+            {
+                float sqt = tweenTimer * tweenTimer;
+                return sqt / (2.0f * (sqt - tweenTimer) + 1.0f);
+            }
             else
-                lerpValue = Mathf.SmoothStep(1.0f, 0.0f, ((tweenTimer * 2) - 1));
+            {
+                float v = 0;
+                if (tweenTimer < 0.5f)
+                    v = Mathf.SmoothStep(0f, 1f, tweenTimer * 2);
+                else
+                    v = Mathf.SmoothStep(1f, 0f, (tweenTimer * 2)-1);
+                return Mathf.Lerp(0f, 1.0f, v);
+            }
         }
-        else if (ease == "outin")
-        {
-            if (tweenTimer < 0.5f)
-                lerpValue = Mathf.SmoothStep(1.0f, 0.0f, tweenTimer * 2);
-            else
-                lerpValue = Mathf.SmoothStep(0.0f, 1.0f, ((tweenTimer * 2) - 1));
-        }
-        else
-            lerpValue = Mathf.SmoothStep(0.0f, 1.0f, tweenTimer);
-
-        return lerpValue;
+        return Mathf.SmoothStep(0.0f, 1.0f, tweenTimer);
     }
 }
