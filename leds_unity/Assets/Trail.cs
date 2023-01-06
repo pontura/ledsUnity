@@ -12,14 +12,14 @@ public class Trail
         all = new List<Particle>();
     }
     int lastLedID;
-    public void OnUpdate(float deltaTime, int ledID, float _speed)
+    public void OnUpdate(float deltaTime, int ledID, float _fade_desaceleration)
     {
         foreach (Particle p in all)
-            p.OnUpdate(deltaTime, _speed);
+            p.OnUpdate(deltaTime, _fade_desaceleration);
 
         if (lastLedID == ledID) return;
         Particle trail = GetParticleOrCreate();
-        trail.Init(ledID);
+        trail.Init(ledID, 180);
     }
     Particle GetParticleOrCreate()
     {

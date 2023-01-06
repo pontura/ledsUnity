@@ -36,8 +36,8 @@ public class Character
     }
     public void OnUpdate(float _speed, float deltaTime)
     {
-        float trail_speed = 1000;
-        trail.OnUpdate(deltaTime, (int)pos, trail_speed);
+        float trail_fade_desaceleration = 500;
+        trail.OnUpdate(deltaTime, (int)pos, trail_fade_desaceleration);
         if (state == 1 || state == 2)
             Move(_speed, deltaTime);
         else if (state == 3)
@@ -46,7 +46,7 @@ public class Character
     float lastSpeed;
     void Move(float _speed, float deltaTime)
     {
-        lastSpeed = Mathf.Lerp(lastSpeed, _speed*maxSpeed, deltaTime * 40);
+        lastSpeed = Mathf.Lerp(lastSpeed, _speed*maxSpeed, deltaTime * 30);
         this.speed = lastSpeed;
         if (state == 1)
         {

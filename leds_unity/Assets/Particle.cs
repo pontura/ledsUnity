@@ -8,9 +8,9 @@ public class Particle : MonoBehaviour
     public float speed;
     public float direction;
 
-    public void Init(int _ledID)
+    public void Init(int _ledID, int initialAlpha)
     {
-        this.value = 255;
+        this.value = initialAlpha;
         this.ledID = _ledID;
     }
     public void SetSpeed(float _speed, float _direction)
@@ -18,10 +18,10 @@ public class Particle : MonoBehaviour
         this.direction = _direction;
         this.speed = _speed;
     }
-    public void OnUpdate(float deltaTime, float _speed_to_fade)
+    public void OnUpdate(float deltaTime, float fade_desaceleration)
     {
         if (this.value == 0) return;
-        this.value = this.value - (_speed_to_fade * deltaTime);
+        this.value = this.value - (fade_desaceleration * deltaTime);
         if (this.value < 0) value = 0;
     }
     public bool IsAvailable()

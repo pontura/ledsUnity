@@ -101,6 +101,8 @@ public class LevelsManager : MonoBehaviour
         }
         activeLevelData = levels[0];
         areaID++;
+        if (areaID > allData.areas.Count-1)
+            areaID = 0;
     }
     Color GetColor(string colorName)
     {

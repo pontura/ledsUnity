@@ -16,6 +16,8 @@ public class LevelZone
     public bool ready;
     bool isMaster;
     float frameRate;
+    public string status;
+
     public void Init(int id, LevelsManager levelsManager, float pos, int length, Color color, int numLeds, float frameRate)
     {
         this.frameRate = frameRate;
@@ -46,8 +48,9 @@ public class LevelZone
         if (pos < 0) pos = numLeds;
        
     }
-    public void Process(float seconds, string status, float deltaTime)
+    public void Process(float seconds, string _status, float deltaTime)
     {
+        this.status = _status;
         tweenTimer += deltaTime / seconds;
         timer += deltaTime;
         SetFromAndTo();
@@ -58,10 +61,6 @@ public class LevelZone
                 Ready();
             }
         }
-        if (status == "safe")
-            color.a = 0.45f;
-        else
-            color.a = 1;
     }
 
 
