@@ -1,0 +1,88 @@
+{
+	"areas":
+	[
+		{	
+			"length": 50,
+			"zones": 
+			 [
+				{ 
+					"color": "blue",
+					"pos": 0
+				},
+				{ 
+					"color": "green",
+					"pos": 0.5
+				}
+			 ],
+			 "levels":
+			 [
+				 { "nextLength":1, "speed": 0, "seconds":3, "ease": "inout"  }
+			]
+		},
+		{	
+			"length": 1,
+			"zones":[{}],
+			"levels": [ { "seconds":1 } ]
+		},
+		{	
+			"length": 20,
+			"zones": 
+			 [
+				{ 
+					"color": "red",
+					"pos": 0.25
+				},
+				{ 
+					"color": "red",
+					"pos": 0.75
+				}
+			 ],
+			 "levels":
+			 [
+				 { "nextLength":20, "speed": 0, "seconds":3, "status": "safe", "ease": "in" },
+				 { "nextLength":2, "speed": -40, "seconds":10, "status": "full", "ease": "inout" },
+				 { "nextLength":10, "speed": 0, "seconds":1 },
+				 { "nextLength":25, "speed": 30, "seconds":4 },
+				 { "nextLength":32, "speed": 0, "seconds":2 },
+				 { "nextLength":32, "speed": -40, "seconds":2 },
+				 { "nextLength":15, "speed": 0, "seconds":1, "status": "safe", "ease": "in" },
+				 { "nextLength":36, "speed": 70, "seconds":5, "status": "full"},
+				 { "nextLength":5, "speed": 0, "seconds":1, "status": "safe", "ease": "in" },
+				 { "nextLength":35, "speed": 70, "seconds":7, "status": "full", "ease": "inout" },
+				 { "nextLength":1, "speed": 80, "seconds":2 },				 
+				 { "nextLength":40, "speed": 0, "seconds":3, "status": "safe", "ease": "in" },
+				 { "nextLength":45, "speed": 0, "seconds":1, "status": "full" },
+				 { "nextLength":10, "speed": -70, "seconds":5, "status": "full" },
+				 { "nextLength":1, "speed": 0, "seconds":2, "status": "safe" }	
+			]
+		},
+		{	
+			"length": 1,
+			"zones":[{}],
+			"levels": [ { "seconds":3 } ]
+		},
+		{	
+			"length": 2,
+			"zones": 
+			 [
+				{ 
+					"color": "red",
+					"pos": 0
+				},
+				{ 
+					"color": "red",
+					"pos": 0.33
+				},
+				{ 
+					"color": "red",
+					"pos": 0.66
+				}
+			 ],
+			 "levels":
+			 [
+				 { "nextLength":20, "speed": 0, "seconds":3, "status": "safe" },
+				 { "nextLength":2, "speed": -100, "seconds":4, "status": "full" }
+			]
+		}
+	]
+}
