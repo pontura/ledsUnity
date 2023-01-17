@@ -1,6 +1,8 @@
 import math
+import LevelsManager
 
-class LevelZone:    
+class LevelZone:
+    color = (0,0,0)
     vfrom = 0
     vto = 0
     numLeds = 0
@@ -32,51 +34,51 @@ class LevelZone:
     tweenTimer = 0.0
     timer = 0.0
 
-    def ScaleTo(nextLength, seconds, ease, deltaTime):
-        lerpValue = GetValueByTweenInTime(ease, deltaTime, seconds, true)
-        length = Mathf.Lerp(initialLength, nextLength, lerpValue)
+    def ScaleTo(self, nextLength, seconds, ease, deltaTime):
+        lerpValue = self.GetValueByTweenInTime(ease, deltaTime, seconds, True)
+        length = self.lerp(self.initialLength, nextLength, lerpValue)
        
-    def Move(speed, seconds, ease, deltaTime):
-        self.pos += GetValueByTweenInTime(ease, deltaTime, seconds, false)*(speed/100) 
-        if pos > numLeds:
-            pos = 0
-        if pos < 0:
-            pos = numLeds
+    def Move(self,speed, seconds, ease, deltaTime):
+        self.pos += self.GetValueByTweenInTime(ease, deltaTime, seconds, False)*(speed/100) 
+        if self.pos > self.numLeds:
+           self.pos = 0
+        if self.pos < 0:
+            self.pos = self.numLeds
        
 
-    def Process( seconds,  _status,  deltaTime):
+    def Process( self,seconds,  _status,  deltaTime):
         self.status = _status
-        tweenTimer += deltaTime / seconds
-        timer += deltaTime
-        SetFromAndTo()
-        if isMaster:
-            if timer > seconds:        
-                Ready()
+        self.tweenTimer += deltaTime / seconds
+        self.timer += deltaTime
+        self.SetFromAndTo()
+        if self.isMaster:
+            if self.timer > seconds:        
+                self.Ready()
            
        
 
-    def Restart(initialLength):
+    def Restart(self,initialLength):
         self.initialLength = initialLength
-        timer = 0
-        tweenTimer = 0
-        ready = false
+        self.timer = 0
+        self.tweenTimer = 0
+        self.ready = False
 
-    def IsInsideCurve(ledID):
-        if vfrom<to and (ledID > vfrom or ledID < vto):
-            return true
-        elif vfrom > vto and (ledID > vfrom or ledID < vto):
-            return true
-        return false
+    def IsInsideCurve(self, ledID):
+        if self.vfrom<self.vto and (ledID > self.vfrom or ledID < self.vto):
+            return True
+        elif self.vfrom > self.vto and (ledID > self.vfrom or ledID < self.vto):
+            return True
+        return False
 
-    def GetColor():
-        return color
+    def GetColor(self):
+        return self.color
        
-    def Ready():
-        if ready != true:
-            timer = 0
-            tweenTimer = 0
-            ready = true
-            levelsManager.OnNextLevel()
+    def Ready(self):
+        if self.ready != True:
+            self.timer = 0
+            self.tweenTimer = 0
+            self.ready = True
+            LevelsManager.OnNextLevel()
 
     def SetFromAndTo(self):
         mid = ((float)(self.length) / 2)
@@ -94,20 +96,20 @@ class LevelZone:
         else:
             return ledID
 
-    def GetValueByTweenInTime(ease, deltaTime, seconds, normalized):
+    def GetValueByTweenInTime(self, ease, deltaTime, seconds, normalized):
         if ease == "inout":
-            if normalized == true:        
-                sqt = tweenTimer * tweenTimer
-                return sqt / (2.0 * (sqt - tweenTimer) + 1.0)        
+            if normalized == True:        
+                sqt = self.tweenTimer * self.tweenTimer
+                return sqt / (2.0 * (sqt - self.tweenTimer) + 1.0)        
             else:        
                 v = 0
-                if tweenTimer < 0.5:
-                    v = lerp(0, 1, tweenTimer * 2)
+                if self.tweenTimer < 0.5:
+                    v = lerp(0, 1, self.tweenTimer * 2)
                 else:
-                    v = lerp(1, 0, (tweenTimer * 2)-1)
+                    v = lerp(1, 0, (self.tweenTimer * 2)-1)
                 return lerp(0, 1.0, v)       
         
-        return lerp(0.0, 1.0, tweenTimer)
+        return self.lerp(0.0, 1.0, self.tweenTimer)
 
-    def lerp(a: float, b: float, t: float) -> float:
+    def lerp(self, a: float, b: float, t: float) -> float:
         return (1 - t) * a + t * b

@@ -17,7 +17,7 @@ class Character:
     #2 in danger
     #3 crash
 
-    def Init(numLeds, _ledID, _color, maxSpeed):    
+    def Init(self, numLeds, _ledID, _color, maxSpeed):    
         #self.trail = new Trail()
         #trail.Init()
         self.state = 1
@@ -30,50 +30,52 @@ class Character:
         self.ledId = _ledID
         self.pos = _ledID
     
-    def OnUpdate(_speed, deltaTime):
+    def OnUpdate(self, _speed, deltaTime):
         #trail_fade_desaceleration = 500
         #trail.OnUpdate(deltaTime, (int)pos, trail_fade_desaceleration)
-        if (self.state == 1 || self.state == 2):
+        if (self.state == 1 or self.state == 2):
             self.Move(_speed, deltaTime)
-        else if (self.state == 3):
+        elif (self.state == 3):
             self.CheckToBeBack()
     
     lastSpeed = 0
-    def Move(_speed, deltaTime):    
+    def Move(self, _speed, deltaTime):
         self.lastSpeed = self.lerp(self.lastSpeed, _speed*self.maxSpeed, deltaTime * 30)
         self.speed = self.lastSpeed
-        if (state == 1):        
-            self.pos = self.pos + speed
-            if (self.pos >= self.numLeds) pos = 0
-            else if (pos < 0) self.pos = self.numLeds - 1
-            self.ledId = (int)self.pos
+        if self.state == 1:        
+            self.pos = self.pos + self.speed
+            if self.pos >= self.numLeds:
+                self.pos = 0
+            elif self.pos < 0:
+                self.pos = self.numLeds - 1
+                
+            self.ledId = math.floor(self.pos)
     
 
-    def OutOfDanger():  
+    def OutOfDanger(self):  
         self.color = self.originalColor
         self.maxSpeed = self.originalSpeed
         self.state = 1
         self.timer = 0
     
     timer = 0
-    def InDangerZone(self, framerate):
+    def InDangerZone(self, deltaTime):
         self.state = 2
-        self.timer += framerate
+        self.timer = self.timer + deltaTime
         self.color = (255,255,255)
         self.maxSpeed = self.dangerZoneMaxSpeed
-        if (self.timer > 0.5)
+        if (self.timer > 0.5):
             self.Crash()
             
     def Crash(self):    
-        color = Color.white
+        color = (255,255,255)
         state = 2
         speed = 0
     
     timeToRestart = 1
-    def CheckToBeBack(self):
-    
-        timer += Time.deltaTime
-        if (timer > timeToRestart)
+    def CheckToBeBack(self, deltaTime):
+        timer = timer + deltaTime
+        if (timer > timeToRestart):
             Restart()
     
     def Restart(self):    
@@ -82,6 +84,6 @@ class Character:
         state = 1
         speed = 0
         
-    def lerp(a: float, b: float, t: float) -> float:
+    def lerp(self, a: float, b: float, t: float) -> float:
         return (1 - t) * a + t * b
     
