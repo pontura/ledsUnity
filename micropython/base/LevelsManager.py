@@ -22,7 +22,6 @@ class LevelData:
 with open('data.json') as s:
     allData = json.load(s)
     
-print(allData["areas"][0])
 
 def Init(_numLeds, _frameRate):
     frameRate = _frameRate
@@ -95,7 +94,6 @@ def GetColor(colorName):
 
 def OnUpdate(deltaTime):
     total = len(allZones)
-    print(total)
     for a in range(total):
         level = allZones[a]
         UpdateLevel(level, deltaTime)

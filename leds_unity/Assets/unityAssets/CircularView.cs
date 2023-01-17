@@ -4,11 +4,21 @@ using UnityEngine;
 
 public class CircularView : MonoBehaviour
 {
+    static CircularView mInstance = null;
     [SerializeField]
     LedAsset ledAsset_to_add;
     public float offset = 200;
     List<LedAsset> all;
-
+    void Awake()
+    {
+        if (mInstance == null)
+            mInstance = this as CircularView;
+        Init(300);
+    }
+    public static CircularView Instance
+    {
+        get {  return mInstance;   }
+    }
     public void Init(int numLeds)
     {
         all = new List<LedAsset>();
@@ -19,12 +29,17 @@ public class CircularView : MonoBehaviour
             all.Add(led);
         }
     }
+    int a = 0;
     public void OnUpdate(List<Color> data)
     {
+        a++;
+        if (a < 10) return;
+        a = 0;
         int id = 0;
         foreach(LedAsset ledAsset in all)
         {
-            ledAsset.UpdateState(data[id]);
+            Color c = data[id];
+            ledAsset.UpdateState(c);
             id++;
         }
     }
