@@ -17,14 +17,14 @@ class Character:
     #2 in danger
     #3 crash
 
-    def Init(self, numLeds, _ledID, _color, maxSpeed):    
+    def Init(self, _numLeds, _ledID, _color, _maxSpeed):    
         #self.trail = new Trail()
         #trail.Init()
         self.state = 1
-        self.originalSpeed = maxSpeed
-        self.dangerZoneMaxSpeed = maxSpeed / 2
-        self.maxSpeed = maxSpeed 
-        self.numLeds = numLeds
+        self.originalSpeed = _maxSpeed
+        self.dangerZoneMaxSpeed = _maxSpeed / 2
+        self.maxSpeed = _maxSpeed 
+        self.numLeds = _numLeds
         self.originalColor = _color
         self.color = _color
         self.ledId = _ledID

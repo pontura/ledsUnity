@@ -1,4 +1,3 @@
-import json
 import LevelsManager, character
 import time
 import FPS
@@ -10,7 +9,7 @@ N = 200_000
 framerate = 30
 characters = []
 ledsData = []
-deltaTime = 0
+
 fps = FPS.fps()
 
 def Init():
@@ -25,7 +24,8 @@ def Init():
     for a in range(numLeds): 
         ledsData.append((0,0,0))
         
-def Update():    
+def Update():
+    deltaTime = 0.01
     while True:
         SetData()
         LevelsManager.OnUpdate(deltaTime)
@@ -36,12 +36,14 @@ def Update():
         deltatime = fps.Update()
         #print(ledsData)
         Udp.Send(ledsData)
-        time.sleep(0.1)
+        time.sleep(0.015)
         
       
 boolValue = False
 def SetData():
+    levelZones = LevelsManager.GetLevelZones()
     global boolValue
+    global ledsData
     if boolValue == False:
         boolValue = True
     else:
@@ -49,24 +51,21 @@ def SetData():
         
     ledsData = []
     for a in range(numLeds): 
-        ledsData.append((0,0,0))
-               
-#     levelZones = LevelsManager.GetLevelZones()
-#     for a in range(len(levelZones)):
-#         levelzone = levelZones[a]    
-#         ledID = levelzone.vfrom
-#         color = levelzone.GetColor()
-#         vto = levelzone.vto
-#         vfrom = levelzone.vfrom
-#         status = levelzone.status
-#         
-#         if (vto>vfrom):        
-#             ColorizeZone(vfrom, vto, color, status)
-#         
-#         elif (vto != vfrom):
-#         
-#             ColorizeZone(vfrom, numLeds, color, status)
-#             ColorizeZone(0, vto, color, status)        
+        ledsData.append((0,0,0))               
+        t = len(levelZones)
+        for a in range(t):
+            levelzone = levelZones[a]    
+            ledID = levelzone.vfrom
+            color = levelzone.GetColor()
+            #print(levelzone.vfrom, " ", levelzone.vto)
+            vto = levelzone.vto
+            vfrom = levelzone.vfrom
+            status = levelzone.status
+            if (vto>vfrom):        
+                ColorizeZone(vfrom, vto, color, status)
+            elif (vto != vfrom):
+                ColorizeZone(vfrom, numLeds, color, status)            
+                ColorizeZone(0, vto, color, status)        
         
     for a in range(len(characters)):
         character = characters[a]
@@ -94,8 +93,11 @@ def SetData():
 #                 ledsData[particle.ledID] = c
             
 def ColorizeZone(vfrom, vto, color, status):
+    #print(" from ", vfrom, "    to: ", vto, "   color ", color, " status: ", status)
+    
     for ledID in range(vto-vfrom):
-        if ledID > ledsData.Count-1:
+        ledID = ledID +vfrom
+        if ledID > len(ledsData)-1:
             return
         elif ledID < 0:
             return

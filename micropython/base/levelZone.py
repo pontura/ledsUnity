@@ -13,6 +13,8 @@ class LevelZone:
     frameRate = 0
     status = ""
     isMaster = False
+    ready = False
+    tweenTimer = 0
     
     def Init(self, _id, pos, length, color, numLeds, frameRate):
         self.frameRate = frameRate
@@ -36,9 +38,11 @@ class LevelZone:
 
     def ScaleTo(self, nextLength, seconds, ease, deltaTime):
         lerpValue = self.GetValueByTweenInTime(ease, deltaTime, seconds, True)
-        length = self.lerp(self.initialLength, nextLength, lerpValue)
+        self.length = self.lerp(self.initialLength, nextLength, lerpValue)
+        #print("seconds: ", seconds,  " initialLength", self.initialLength, " length: ", self.length, " nextLength: ", nextLength, " lerpValue: ", lerpValue )
        
     def Move(self,speed, seconds, ease, deltaTime):
+       # print("move", self.pos)
         self.pos += self.GetValueByTweenInTime(ease, deltaTime, seconds, False)*(speed/100) 
         if self.pos > self.numLeds:
            self.pos = 0
@@ -53,9 +57,7 @@ class LevelZone:
         self.SetFromAndTo()
         if self.isMaster:
             if self.timer > seconds:        
-                self.Ready()
-           
-       
+                self.Ready()       
 
     def Restart(self,initialLength):
         self.initialLength = initialLength
@@ -82,13 +84,12 @@ class LevelZone:
 
     def SetFromAndTo(self):
         mid = ((float)(self.length) / 2)
-        self.vfrom = math.floor(self.pos) - mid
-        self.vto = math.floor(self.pos) + mid
-        self.vfrom = self.GetValueInsideLeds(self.vfrom)
-        self.vto = self.GetValueInsideLeds(self.vto)
+        f = math.floor(self.pos) - mid
+        t = math.floor(self.pos) + mid
+        self.vfrom = int(self.GetValueInsideLeds(f))
+        self.vto = int(self.GetValueInsideLeds(t))
 
     def GetValueInsideLeds(self, ledID):
-
         if ledID > self.numLeds:
             return ledID - self.numLeds
         elif ledID < 0:
@@ -104,10 +105,10 @@ class LevelZone:
             else:        
                 v = 0
                 if self.tweenTimer < 0.5:
-                    v = lerp(0, 1, self.tweenTimer * 2)
+                    v = self.lerp(0, 1, self.tweenTimer * 2)
                 else:
-                    v = lerp(1, 0, (self.tweenTimer * 2)-1)
-                return lerp(0, 1.0, v)       
+                    v = self.lerp(1, 0, (self.tweenTimer * 2)-1)
+                return self.lerp(0, 1.0, v)       
         
         return self.lerp(0.0, 1.0, self.tweenTimer)
 

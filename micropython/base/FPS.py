@@ -11,7 +11,7 @@ class fps:
             self.fps = self.fps_count
             self.fps_count = 1
             self.start_time = t
-            print("FPS:",self.fps)
+            #print("FPS:",self.fps)
         else:
             self.fps_count += 1
         

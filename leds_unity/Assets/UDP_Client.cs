@@ -39,9 +39,9 @@ public class UDP_Client : MonoBehaviour
             string[] c = s.Split(","[0]);
             if (c.Length > 1)
             {
-                color.r = 255;
-                color.g = (int.Parse(c[1]));
-                color.b =(int.Parse(c[2]));
+                color.r = (float.Parse(c[0])/255);
+                color.g = (float.Parse(c[1]) / 255);
+                color.b =(float.Parse(c[2]) / 255);
                 color.a = 1;
                 list.Add(color);
             }

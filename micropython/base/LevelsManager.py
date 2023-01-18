@@ -1,8 +1,33 @@
 import levelZone
 import json
+        
+d ='''{
+  "areas":
+  [
+      {
+        "length": "0",
+        "zones":
+        [
+            {
+              "color": "",
+              "pos": ""
+            }
+        ],
+        "levels":
+        [
+            {
+              "nextLength": 0,
+              "speed": 0,
+              "seconds": 0,
+              "ease": 0
+            }
+        ]
+      }
+  ]
+}'''
 
-levels = []
-allZones = []
+levels = [object]
+allZones = [object]
 
 framerate = 0
 levelID = 0
@@ -20,23 +45,31 @@ class LevelData:
     ease = ""
 
 with open('data.json') as s:
-    allData = json.load(s)
+    d = json.load(s)
+    #print(d)
     
 
 def Init(_numLeds, _frameRate):
+    global numLeds
     frameRate = _frameRate
     allZones = []
     numLeds = _numLeds
-    AddNewArea()
+    AddNewArea(frameRate, numLeds)
 
-def AddLevel(nextLength, speed, seconds, status, ease):
+def AddLevel(_nextLength, speed, seconds, status, ease):
     global lastLength
     global lastStatus
+    global numLeds
+    global levels
     
-    nextLength = nextLength * (numLeds / 100) # numLeds/100 normaliza de 0 a 100 el scalesss
+    nextLength = _nextLength * (numLeds / 100) # numLeds/100 normaliza de 0 a 100 el scalesss
+    print("level nextLength", _nextLength, " speed: ", speed, " seconds:", seconds, " status", status, " ease:", ease, " numLeds: ", numLeds)
     lData = LevelData
     lData.speed = speed
     lData.initialLength = lastLength
+    lData.nextLength = nextLength
+    lData.seconds = seconds
+    lData.status = status
     lData.ease = ease
 
     if status == "":
@@ -46,40 +79,73 @@ def AddLevel(nextLength, speed, seconds, status, ease):
 
     lData.nextLength = nextLength
     lData.seconds = seconds
+    levels = []
     levels.append(lData)
     
     lastStatus = status
     lastLength = nextLength
 
 
-def AddNewArea():
+def AddNewArea(framerate, numLeds):
+    global allZones
     global areaID
-    areaData = allData["areas"][areaID]
-    length = len(areaData) * (numLeds / 100)#//numLeds/100 normaliza de 0 a 100 el scalesss
+    global thisLevelZone
+    global levels
+    
+    areaData = d["areas"][areaID]
+    length = areaData["length"] * (numLeds / 100)#//numLeds/100 normaliza de 0 a 100 el scalesss
     lastLength = length
     zones = areaData["zones"]
-    qty = len(zones)
+    
+    
+    allZones = [object]
+    
+    zN = len(zones)
+    
     _id = 0
-    for a in range(qty):               
+    for a in range(zN):               
         thisLevelZone = levelZone.LevelZone()
         zonesData = zones[a]
-        color = GetColor(zonesData["color"])
-        pos = zonesData["pos"]*numLeds
+        
+        if len(zonesData)>0:
+            color = GetColor(zonesData["color"])
+            pos = zonesData["pos"]*numLeds
+        else:
+            color = (0,0,0)
+            pos = 0
+           
         thisLevelZone.Init(_id, pos, length, color, numLeds, framerate)
         allZones.append(thisLevelZone)
         _id = _id+1
-    
-    levels =areaData["levels"]
-    
-    for a in range(len(levels)):
-        lData = levels[a]
-        status = ""            
         
-        AddLevel(lData["nextLength"], lData["speed"], lData["seconds"], status, lData["ease"])
-    
+    levels = [object]
+    l = areaData["levels"]
+    lN = len(l)
+    print("Add area id:", areaID, " zones: ", zN, " levels:", lN, " numLeds:", numLeds)
+      
+    for a in range(lN):        
+        lData = l[a]
+        speed = 0
+        status = ""
+        nextLength = 0
+        seconds = ""
+        ease = ""
+        
+        if lData.get("status"):
+            status = lData["status"]
+        if lData.get("speed"):
+            speed = lData["speed"]
+        if lData.get("nextLength"):
+            nextLength = lData["nextLength"]
+        if lData.get("seconds"):
+            seconds = lData["seconds"]
+        if lData.get("ease"):
+            ease = lData["ease"]
+            
+        AddLevel(nextLength, speed, seconds, status, ease)    
     
     areaID = areaID+1
-    if areaID > len(allData["areas"])-1:
+    if areaID > len(d["areas"])-1:
         areaID = 0
 
 def GetColor(colorName):
@@ -95,11 +161,15 @@ def GetColor(colorName):
 def OnUpdate(deltaTime):
     total = len(allZones)
     for a in range(total):
-        level = allZones[a]
-        UpdateLevel(level, deltaTime)
+        if a < len(allZones):
+            level = allZones[a]
+            UpdateLevel(level, deltaTime)
 
 def UpdateLevel(level, deltaTime):
     activeLevelData = levels[levelID]
+    #print("initialLength: ", activeLevelData.initialLength,  " nextLength", activeLevelData.nextLength,  " seconds", activeLevelData.seconds  )
+       
+       
     if activeLevelData.nextLength != activeLevelData.initialLength:
         level.ScaleTo(activeLevelData.nextLength, activeLevelData.seconds, activeLevelData.ease, deltaTime)
     if activeLevelData.speed != 0:
@@ -107,17 +177,23 @@ def UpdateLevel(level, deltaTime):
 
     level.Process(activeLevelData.seconds, activeLevelData.status, deltaTime)
 
-def  OnNextLevel():
+def OnNextLevel():
+    global levelID
+    global activeLevelData
+    global framerate
+    global numLeds
     levelID = levelID+1
-    if levelID > levels.Count - 1:    
+    
+    if levelID > len(levels) - 1:    
         levelID = 0
-        AddNewArea()
-#     else:    
-#         activeLevelData = levels[levelID]
+        AddNewArea(framerate, numLeds)
+    else:    
+        activeLevelData = levels[levelID]
+        
     activeLevelData = levels[levelID]
     for a in range(len(allZones)):
         LevelZone = allZones[a]
-        levelzone.Restart(activeLevelData.initialLength)
+        LevelZone.Restart(activeLevelData.initialLength)
 
 def GetLevelZones():
     return allZones 
