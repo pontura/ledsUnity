@@ -13,7 +13,6 @@ public class CircularView : MonoBehaviour
     {
         if (mInstance == null)
             mInstance = this as CircularView;
-        Init(300);
     }
     public static CircularView Instance
     {
