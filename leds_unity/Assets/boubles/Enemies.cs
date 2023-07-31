@@ -19,9 +19,12 @@ namespace Boubles
         int currentColor;
         int currentColor2;
         BoublesGame game;
+        int from, to = 0;
 
-        public void Init(BoublesGame game, int totalColors, int numLeds)
+        public void Init(BoublesGame game, int totalColors, int chararter_width, int numLeds)
         {
+            from = chararter_width;
+            to = numLeds - chararter_width;
             this.game = game;
             data = new List<int>();
             data2 = new List<int>();
@@ -53,6 +56,7 @@ namespace Boubles
         public void OnUpdate(float deltaTime)
         {
             timer += deltaTime;
+
             if (timer > speed)
             {
                 if (bubbleWidth >= bubbleTotalWidth)
@@ -69,6 +73,50 @@ namespace Boubles
 
                 bubbleWidth++;
                 timer = 0;
+
+                Draw();
+            }
+            CleanLeds();
+        }
+        void CleanLeds()
+        {
+            int firstMid = centerLedID - data2.Count;
+            for (int a = from; a < firstMid; a++)
+                game.ledsData[a] = Color.black;
+            int lastMid = centerLedID + data.Count;
+            for (int a = lastMid; a < to; a++)
+                game.ledsData[a] = Color.black;
+        }
+        void Draw()
+        {
+
+            int center = centerLedID;
+            int ledId = 0;
+
+           
+
+            foreach (int colorID in data)
+            {
+                int ledID = ledId + center;
+                if (ledID > numLeds - 5)
+                {
+                    game.Win(2);
+                    return;
+                }
+                game.ledsData[ledID] = game.colors[colorID];
+                ledId++;
+            }
+            ledId = 0;
+            foreach (int colorID in data2)
+            {
+                int ledID = center - ledId;
+                if (ledID < 5)
+                {
+                    game.Win(1);
+                    return;
+                }
+                game.ledsData[ledID] = game.colors[colorID];
+                ledId++;
             }
         }
         void DestroyLine()
@@ -115,12 +163,13 @@ namespace Boubles
                 {
                     if (from != 0 && to != 0)
                     {
-                        game.AddExplotion(from, to, 1);
+                        game.AddExplotion(from, to, 1, color);
                         OnReward(1, 2);
                     }
                     return;
                 }
             }
+            Draw();
         }
         void DestroyLastColor2(int color)
         {
@@ -140,12 +189,13 @@ namespace Boubles
                 else {
                     if (from != 0 && to != 0)
                     {
-                        game.AddExplotion(from, to, 2);
+                        game.AddExplotion(from, to, 2, color);
                         OnReward(2, 2);
                     }
                     return;
                 }
             }
+            Draw();
         }
         void AddColors(int color, int characterID)
         {
@@ -156,6 +206,7 @@ namespace Boubles
                 else
                     data2.Add(color);
             }
+            Draw();
         }
 
 

@@ -14,15 +14,17 @@ namespace Boubles
         public bool isOn;
         int dir;
         float pos;
+        public Color color;
 
-        public void Init(int numLeds, int ledId, int dir)
+        public void Init(int numLeds, int ledId, int dir, Color color)
         {
             this.ledId = ledId;
             this.numLeds = numLeds;
-            Restart(ledId, dir);
+            Restart(ledId, dir, color);
         }
-        public void Restart(int ledId, int dir)
+        public void Restart(int ledId, int dir, Color color)
         {
+            this.color = color;
             timer = 0;
             isOn = true;
             this.dir = dir;
@@ -36,7 +38,6 @@ namespace Boubles
         public void OnUpdate(float deltaTime)
         {
             timer += deltaTime;
-            if (timer < 0.05f) return;
             speed /= 1.01f;
             pos += deltaTime * speed * dir;
             alpha -= deltaTime/2;

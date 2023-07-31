@@ -56,7 +56,6 @@ namespace Boubles
                     isOn = false; return;
                 }
             }
-           
             this.ledId = (int)pos;
             int thisLed = ledId - (int)(Mathf.Floor(width / 2));
             if (thisLed < 0) thisLed = numLeds - 1 + thisLed;
