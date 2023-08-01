@@ -23,8 +23,8 @@ namespace Boubles
 
         public void Restart()
         {
-            explotions.Clear();
-            bullets.Clear();
+            explotions = new List<ExplotionParticle>();
+            bullets = new List<Bullet>();
         }
 
         public void OnUpdate(float deltaTime)
@@ -33,50 +33,47 @@ namespace Boubles
             {
                 if (e.isOn)
                 { 
-                    
-
                     e.OnUpdate(deltaTime);
                 }
             }
 
             foreach (ExplotionParticle e in explotions)
                 if (e.isOn)
+                {
                     e.OnUpdate(deltaTime);
+                    if (e.isOn)
+                    {
+                        Color c = e.color;
+                        c.a = e.alpha;
+                        game.ledsData[e.ledId] = c;
+                    }
+                }
 
             Draw();
         }
         void Draw()
         {
-            foreach (ExplotionParticle a in explotions)
-            {
-                if (a.isOn)
-                {
-                    Color c = a.color;
-                    c.a = a.alpha;
-                    game.ledsData[a.ledId] = c;
-                }
-            }
+            int max = game.enemies.data.Count + game.enemies.centerLedID;
+            int max2 = game.enemies.centerLedID - game.enemies.data2.Count;
 
-            int ledId = 0;
             foreach (Bullet b in bullets)
             {
                 if (b.isOn)
                 {
-                    int max = game.enemies.data.Count + game.enemies.centerLedID;
-                    int max2 = game.enemies.centerLedID - game.enemies.data2.Count;
                     foreach (int l in b.leds)
                     {
-                        if ((b.characterID == 1 && ledId == 0 && l <= max) ||
-                            (b.characterID == 2 && ledId == 0 && l >= max2)
+                        if ((b.characterID == 1 &&  l <= max) ||
+                            (b.characterID == 2 &&  l >= max2)
                             )
                         {
                             game.enemies.CollideWith(b.color, b.characterID);
                             b.Collide();
-                            return;
                         }
-                        game.ledsData[l] = game.colors[b.color];
+                        else
+                        {
+                            game.ledsData[l] = game.colors[b.color];
+                        }
                     }
-                    ledId++;
                 }
             }
         }

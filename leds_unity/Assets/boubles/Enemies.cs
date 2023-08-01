@@ -10,26 +10,21 @@ namespace Boubles
         public List<int> data2;
 
         public int centerLedID;
+
         int numLeds;
-        int totalColors;
-        float delayToAdd = 3;
-        float speed = 0.4f;
+
         int bubbleTotalWidth = 8;
         int bubbleWidth = 0;
         int currentColor;
         int currentColor2;
         BoublesGame game;
-        int from, to = 0;
 
-        public void Init(BoublesGame game, int totalColors, int chararter_width, int numLeds)
+        public void Init(BoublesGame game, int chararter_width, int numLeds)
         {
-            from = chararter_width;
-            to = numLeds - chararter_width;
             this.game = game;
             data = new List<int>();
             data2 = new List<int>();
-
-            this.totalColors = totalColors;
+            Restart();
             this.numLeds = numLeds;
 
             Center();
@@ -50,50 +45,38 @@ namespace Boubles
                 this.centerLedID -= rewards;
             else
                 this.centerLedID += rewards;
-            Debug.Log("center: " + centerLedID);
         }
-        float timer = 0;
-        public void OnUpdate(float deltaTime)
+        public void UpdateDraw()
         {
-            timer += deltaTime;
-
-            if (timer > speed)
+            if (bubbleWidth >= bubbleTotalWidth)
             {
-                if (bubbleWidth >= bubbleTotalWidth)
-                {
-                    SetNewBubble1();
-                    SetNewBubble2();
-                    bubbleWidth = 0;
-                }
-                
-                DestroyLine();
-
-                AddLine();
-                AddLine();
-
-                bubbleWidth++;
-                timer = 0;
-
-                Draw();
+                SetNewBubble1();
+                SetNewBubble2();
+                bubbleWidth = 0;
             }
-            CleanLeds();
+
+            DestroyLine();
+
+            AddLine();
+            AddLine();
+
+            bubbleWidth++;
+
+            Draw();
         }
-        void CleanLeds()
+        public void CleanLeds()
         {
             int firstMid = centerLedID - data2.Count;
-            for (int a = from; a < firstMid; a++)
+            for (int a = game.from; a < firstMid; a++)
                 game.ledsData[a] = Color.black;
             int lastMid = centerLedID + data.Count;
-            for (int a = lastMid; a < to; a++)
+            for (int a = lastMid; a < game.to; a++)
                 game.ledsData[a] = Color.black;
         }
         void Draw()
         {
-
             int center = centerLedID;
-            int ledId = 0;
-
-           
+            int ledId = 0;           
 
             foreach (int colorID in data)
             {
@@ -136,11 +119,11 @@ namespace Boubles
         {
             if (characterID == 1)
             {
-                if (data[data.Count - 1] == color) DestroyLastColor1(color);
+                if (data.Count>1 && data[data.Count - 1] == color) DestroyLastColor1(color);
                 else AddColors(color, characterID);
             } else
             {
-                if (data2[data2.Count - 1] == color) DestroyLastColor2(color);
+                if (data2.Count > 1 && data2[data2.Count - 1] == color) DestroyLastColor2(color);
                 else AddColors(color, characterID);
             }
         }   
@@ -212,13 +195,13 @@ namespace Boubles
 
         void SetNewBubble1()
         {
-            int newColor = Random.Range(0, totalColors);
+            int newColor = Random.Range(0, game.totalColors);
             if (newColor == currentColor)  SetNewBubble1();
             else currentColor = newColor;
         }
         void SetNewBubble2()
         {
-            int newColor = Random.Range(0, totalColors);
+            int newColor = Random.Range(0, game.totalColors);
             if (newColor == currentColor2)   SetNewBubble2();
             else currentColor2 = newColor;
         }

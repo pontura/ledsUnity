@@ -16,12 +16,32 @@ namespace Boubles
         public List<Color> colors;
 
         int chararter_width = 10;
+        float delayToAdd;
+        float minDelayToAdd;
+        float speed;
+        float timeToAddColor;
+        public int totalColors;
+        float seconds = 0;
+        float timer = 0;
+        public int from = 0;
+        public int to = 0;
+
+        public void Init()
+        {
+            delayToAdd = 0.5f;
+            minDelayToAdd = 0.1f;
+            speed = 0.0025f;
+            timeToAddColor = 15;
+            totalColors = 3;
+            seconds = 0;
+            timer = 0;
+        }
 
         void Start()
         {
-            colors = new List<Color> { Color.green, Color.red, Color.blue, Color.yellow, Color.cyan };
+            colors = new List<Color> { Color.green, Color.red, Color.blue, Color.yellow, Color.cyan, Color.magenta, Color.grey };
             enemies = new Enemies();
-            enemies.Init(this, colors.Count, chararter_width, numLeds);
+            enemies.Init(this, chararter_width, numLeds);
 
             shoots = new Shoots();
             shoots.Init(this, numLeds);
@@ -38,16 +58,21 @@ namespace Boubles
             ch.Init(this, 2, 0, chararter_width, colors.Count);
             characters.Add(ch);
 
+            from = chararter_width;
+            to = numLeds- chararter_width;
+
             view.Init(numLeds);
             ledsData = new List<Color>();
             for (int a = 0; a < numLeds; a++)
                 ledsData.Add(Color.black);
+
+            Restart();
+
         }
         void Update()
         {
             float deltaTime = Time.deltaTime;
-            enemies.OnUpdate(deltaTime);
-            shoots.OnUpdate(deltaTime);
+            OnUpdate(deltaTime);
             characters[0].Draw(numLeds);
             characters[1].Draw(numLeds);
             SendData();
@@ -75,12 +100,45 @@ namespace Boubles
 
         public void Win(int charaterID)
         {
-            enemies.Restart();
-            shoots.Restart();
+            Restart();
         }
         public void AddExplotion(int from, int to, int characterID, int color)
         {
             shoots.AddExplotion(from, to, characterID, color);
+        }
+
+        
+
+        public void Restart()
+        {
+            Init();
+            enemies.Restart();
+            shoots.Restart();
+        }
+        void OnUpdate(float deltaTime)
+        {
+            seconds += deltaTime;
+            timer += deltaTime;
+
+            if (timer > delayToAdd)
+            {
+                if (delayToAdd < minDelayToAdd)
+                    delayToAdd = minDelayToAdd;
+                else
+                    delayToAdd -= speed;
+
+                if (seconds > timeToAddColor)
+                {
+                    if (totalColors < colors.Count - 1)
+                        totalColors++;
+                    seconds = 0;
+                }
+                timer = 0;
+
+                enemies.UpdateDraw();
+            }
+            enemies.CleanLeds();
+            shoots.OnUpdate(deltaTime);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Boubles
         }
         void SetSecondaryColor()
         {
-            color2 = Random.Range(0, totalColors);
+            color2 = Random.Range(0, game.totalColors);
             if (color2 == color)
                 SetSecondaryColor();
         }
