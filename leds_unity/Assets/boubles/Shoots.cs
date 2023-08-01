@@ -27,17 +27,10 @@ namespace Boubles
             bullets = new List<Bullet>();
         }
 
-        public void OnUpdate(float deltaTime)
+        public void OnUpdate(int centerLedID, int data1Count, int data2Count, float deltaTime)
         {
-            foreach (Bullet e in bullets)
-            {
-                if (e.isOn)
-                { 
-                    e.OnUpdate(deltaTime);
-                }
-            }
-
             foreach (ExplotionParticle e in explotions)
+            {
                 if (e.isOn)
                 {
                     e.OnUpdate(deltaTime);
@@ -48,35 +41,35 @@ namespace Boubles
                         game.ledsData[e.ledId] = c;
                     }
                 }
+            }
 
-            Draw();
-        }
-        void Draw()
-        {
-            int max = game.enemies.data.Count + game.enemies.centerLedID;
-            int max2 = game.enemies.centerLedID - game.enemies.data2.Count;
-
-            foreach (Bullet b in bullets)
+            int max = data1Count + centerLedID;
+            int max2 = centerLedID - data2Count;
+            foreach (Bullet e in bullets)
             {
-                if (b.isOn)
+                if (e.isOn)
                 {
-                    foreach (int l in b.leds)
+                    e.OnUpdate(deltaTime);
+                    if(e.isOn)
                     {
-                        if ((b.characterID == 1 &&  l <= max) ||
-                            (b.characterID == 2 &&  l >= max2)
-                            )
+                        foreach (int l in e.leds)
                         {
-                            game.enemies.CollideWith(b.color, b.characterID);
-                            b.Collide();
-                        }
-                        else
-                        {
-                            game.ledsData[l] = game.colors[b.color];
+                            if ((e.characterID == 1 && l <= max) ||
+                                (e.characterID == 2 && l >= max2)
+                                )
+                            {
+                                game.CollideWith(e.color, e.characterID);
+                                e.Collide();
+                            }
+                            else
+                            {
+                                game.ledsData[l] = game.colors[e.color];
+                            }
                         }
                     }
                 }
             }
-        }
+        }       
         public void AddBullet(int characterID, int ledID, int color)
         {
             foreach (Bullet b in bullets)

@@ -5,15 +5,17 @@ namespace Boubles
 {
     public class BoublesGame : MonoBehaviour
     {
+        [SerializeField] CircularView view;
+
+        public List<Color> colors;
+        public List<Color> ledsData;
+
+        InputManager inputs;
+        Enemies enemies;
+        Shoots shoots;
         List<Character> characters;
         int numLeds = 288;
-        [SerializeField] CircularView view;
         float framerate = 30;
-        public List<Color> ledsData;
-        InputManager inputs;
-        public Enemies enemies;
-        Shoots shoots;
-        public List<Color> colors;
 
         int chararter_width = 10;
         float delayToAdd;
@@ -25,6 +27,7 @@ namespace Boubles
         float timer = 0;
         public int from = 0;
         public int to = 0;
+        public int centerLedID;
 
         public void Init()
         {
@@ -35,10 +38,12 @@ namespace Boubles
             totalColors = 3;
             seconds = 0;
             timer = 0;
+            centerLedID = numLeds / 2;
         }
 
         void Start()
         {
+            Init();
             colors = new List<Color> { Color.green, Color.red, Color.blue, Color.yellow, Color.cyan, Color.magenta, Color.grey };
             enemies = new Enemies();
             enemies.Init(this, chararter_width, numLeds);
@@ -52,10 +57,10 @@ namespace Boubles
 
             Character ch;
             ch = new Character();
-            ch.Init(this, 1, numLeds-1, chararter_width, colors.Count);
+            ch.Init(this, 1, numLeds-1, chararter_width, totalColors);
             characters.Add(ch);
             ch = new Character();
-            ch.Init(this, 2, 0, chararter_width, colors.Count);
+            ch.Init(this, 2, 0, chararter_width, totalColors);
             characters.Add(ch);
 
             from = chararter_width;
@@ -92,12 +97,10 @@ namespace Boubles
         {
             characters[characterID-1].ChangeColors();
         }
-
         void SendData()
         {
             view.OnUpdate(ledsData);
         }
-
         public void Win(int charaterID)
         {
             Restart();
@@ -106,9 +109,6 @@ namespace Boubles
         {
             shoots.AddExplotion(from, to, characterID, color);
         }
-
-        
-
         public void Restart()
         {
             Init();
@@ -138,7 +138,11 @@ namespace Boubles
                 enemies.UpdateDraw();
             }
             enemies.CleanLeds();
-            shoots.OnUpdate(deltaTime);
+            shoots.OnUpdate(centerLedID, enemies.data.Count, enemies.data2.Count, deltaTime);
+        }
+        public void CollideWith(int color, int characterID)
+        {
+            enemies.CollideWith(color, characterID);
         }
     }
 }

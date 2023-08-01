@@ -9,8 +9,6 @@ namespace Boubles
         public List<int> data;
         public List<int> data2;
 
-        public int centerLedID;
-
         int numLeds;
 
         int bubbleTotalWidth = 8;
@@ -26,25 +24,18 @@ namespace Boubles
             data2 = new List<int>();
             Restart();
             this.numLeds = numLeds;
-
-            Center();
         }
         public void Restart()
         {
-            Center();
             data.Clear();
             data2.Clear();
-        }
-        void Center()
-        {
-            this.centerLedID = numLeds / 2;
         }
         void OnReward(int characterID, int rewards)
         {
             if(characterID == 1)
-                this.centerLedID -= rewards;
+                game.centerLedID -= rewards;
             else
-                this.centerLedID += rewards;
+                game.centerLedID += rewards;
         }
         public void UpdateDraw()
         {
@@ -66,16 +57,16 @@ namespace Boubles
         }
         public void CleanLeds()
         {
-            int firstMid = centerLedID - data2.Count;
+            int firstMid = game.centerLedID - data2.Count;
             for (int a = game.from; a < firstMid; a++)
                 game.ledsData[a] = Color.black;
-            int lastMid = centerLedID + data.Count;
+            int lastMid = game.centerLedID + data.Count;
             for (int a = lastMid; a < game.to; a++)
                 game.ledsData[a] = Color.black;
         }
         void Draw()
         {
-            int center = centerLedID;
+            int center = game.centerLedID;
             int ledId = 0;           
 
             foreach (int colorID in data)
@@ -137,9 +128,9 @@ namespace Boubles
                 if (data[a] == color)
                 {
                     data.RemoveAt(data.Count - 1);
-                    from = a + centerLedID;
+                    from = a + game.centerLedID;
                     if (num == 0)
-                        to = a + centerLedID;
+                        to = a + game.centerLedID;
                     num++;
                 }
                 else
@@ -164,9 +155,9 @@ namespace Boubles
                 if (data2[a] == color)
                 {
                     data2.RemoveAt(data2.Count - 1);
-                    to = centerLedID - a;
+                    to = game.centerLedID - a;
                     if (num == 0)
-                        from = centerLedID - a;
+                        from = game.centerLedID - a;
                     num++;
                 }
                 else {
