@@ -22,12 +22,13 @@ namespace Boubles
         float minDelayToAdd;
         float speed;
         float timeToAddColor;
-        public int totalColors;
         float seconds = 0;
         float timer = 0;
-        public int from = 0;
-        public int to = 0;
-        public int centerLedID;
+
+        public int totalColors;
+        int from = 0;
+        int to = 0;
+        int centerLedID;
 
         public void Init()
         {
@@ -135,9 +136,9 @@ namespace Boubles
                 }
                 timer = 0;
 
-                enemies.UpdateDraw();
+                enemies.UpdateDraw(centerLedID);
             }
-            enemies.CleanLeds();
+            enemies.CleanLeds(centerLedID, from, to);
             shoots.OnUpdate(centerLedID, enemies.data.Count, enemies.data2.Count, deltaTime);
         }
         public void CollideWith(int color, int characterID)
