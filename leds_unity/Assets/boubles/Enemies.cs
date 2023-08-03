@@ -31,13 +31,7 @@ namespace Boubles
             data.Clear();
             data2.Clear();
         }
-        void OnReward(int characterID, int rewards)
-        {
-            if(characterID == 1)
-                centerLedID -= rewards;
-            else
-                centerLedID += rewards;
-        }
+       
         public void UpdateDraw(int centerLedID)
         {
             this.centerLedID = centerLedID;
@@ -140,7 +134,7 @@ namespace Boubles
                     if (from != 0 && to != 0)
                     {
                         game.AddExplotion(from, to, 1, color);
-                        OnReward(1, 2);
+                        game.OnReward(1, 2);
                     }
                     return;
                 }
@@ -166,7 +160,7 @@ namespace Boubles
                     if (from != 0 && to != 0)
                     {
                         game.AddExplotion(from, to, 2, color);
-                        OnReward(2, 2);
+                        game.OnReward(2, 2);
                     }
                     return;
                 }

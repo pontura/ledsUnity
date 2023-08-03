@@ -145,5 +145,12 @@ namespace Boubles
         {
             enemies.CollideWith(color, characterID);
         }
+        public void OnReward(int characterID, int reward)
+        {
+            if (characterID == 1)
+                this.centerLedID -= reward;
+            else
+                this.centerLedID += reward;
+        }
     }
 }
