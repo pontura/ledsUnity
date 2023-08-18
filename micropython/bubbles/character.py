@@ -3,6 +3,7 @@ import urandom
 class Character:
     global game
     width = 0
+    wa = 0
     characterID = 0
     ledId = 0
     totalColors = 0
@@ -14,32 +15,45 @@ class Character:
         self.width = width
         self.characterID = characterID
         self.ledId = ledID
-        self.state = 1
-        self.totalColors = totalColors
-        self.color = urandom.randint(1, totalColors - 1)
+        self.Restart()
+        
+    def Restart(self):
+        self.wa = 1
+        self.totalColors = self.game.totalColors
+        self.state = 1  
+        self.color = urandom.randint(0, self.totalColors - 1)
         self.color2 = self.color
         self.ChangeColors()
 
     def ChangeColors(self):
+        self.wa = 1
         self.color = self.color2
         self.SetSecondaryColor()
 
     def SetSecondaryColor(self):
-        self.color2 = urandom.randint(1, self.game.totalColors - 1)       
-        
+        self.color2 = urandom.randint(0, self.game.totalColors - 1)  
         if self.color2 == self.color:
-            self.SetSecondaryColor()
+            self.SetSecondaryColor()            
 
     def Draw(self, numLeds):
+        
+        if self.wa < self.width:
+            self.wa = self.wa+1
+            
+        w = self.wa/2
         if self.characterID == 1:
-            for a in range( numLeds - 1 -self.width, numLeds):
-                if a >= numLeds - 1 - self.width/2:
+            f = numLeds - 1 - self.wa
+            t = numLeds
+            for a in range( f, t):
+                if a >= numLeds - 2:
                     self.game.ledsData[a] = self.game.colors[self.color2]
                 else:
                     self.game.ledsData[a] = self.game.colors[self.color]
         else:
-             for a in range(0, self.width):
-                if a >= self.width /2:
+            f = 0
+            t = self.wa
+            for a in range(f, t):
+                if a > 2:
                     self.game.ledsData[a] = self.game.colors[self.color]
                 else:
                     self.game.ledsData[a] = self.game.colors[self.color2]  

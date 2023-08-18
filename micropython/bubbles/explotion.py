@@ -2,29 +2,32 @@ import urandom
 
 class ExplotionParticle:
     def Init(self, numLeds, ledId, dir, color):
-        self.speed = urandom.uniform(20, 80)
         self.ledId = ledId
         self.numLeds = numLeds
-        self.color = color
         self.Restart(ledId, dir, color)
 
-    def Restart(self, ledId, dir, color):
-        self.color = color
+    def Restart(self, ledId, dir, color):        
+        self.speed = urandom.uniform(20, 120)
+        self.color = 10
+        self.oColor = color
         self.timer = 0
         self.isOn = True
         self.dir = dir
-        self.speed /= 1.01
         self.ledId = ledId
         self.pos = ledId
-        self.alpha = 1
+        self.alpha = 0.9
 
     def OnUpdate(self, deltaTime):
         self.timer += deltaTime
-        self.speed /= 1.01
+        if self.timer > 0.25:
+            self.color = self.oColor
+        self.speed /= 1.1
         self.pos += deltaTime * self.speed * self.dir
-        self.alpha -= deltaTime / 2
+        self.alpha -= deltaTime / (self.speed/50)
         if self.alpha < 0:
+            self.isOn = False
             self.alpha = 0
+            return
 
         self.ledId = int(self.pos)
         if self.ledId < 0:

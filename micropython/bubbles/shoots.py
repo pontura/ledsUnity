@@ -19,21 +19,22 @@ class Shoots:
                 e.OnUpdate(deltaTime)
                 if e.isOn:
                     c = e.color
-                    #c.a = e.alpha
-                    self.game.ledsData[e.ledId] = c
+                    self.game.ledsData[e.ledId] = c+e.alpha
 
         max_data1 = data1Count + centerLedID
         max_data2 = centerLedID - data2Count
         for e in self.bullets:
+            color = e.color
             if e.isOn:
                 e.OnUpdate(deltaTime)
                 if e.isOn:
                     for l in e.leds:
                         if (e.characterID == 1 and l <= max_data1) or (e.characterID == 2 and l >= max_data2):
-                            self.game.CollideWith(e.color, e.characterID)
+                            self.game.CollideWith(color, e.characterID)
                             e.Collide()
+                            return
                         else:
-                            self.game.ledsData[l] = self.game.colors[e.color]
+                            self.game.ledsData[l] = self.game.colors[color]
 
     def AddBullet(self, characterID, ledID, color):
         for b in self.bullets:
@@ -44,7 +45,7 @@ class Shoots:
         e.Init(self, characterID, self.numLeds, ledID, color)
         self.bullets.append(e)
 
-    def AddExplotion(self, from_range, to_range, characterID, color):
+    def AddExplotion(self, from_range, to_range, characterID, color):        
         for a in range(from_range, to_range):
             self.AddExplotionParticle(a, characterID, color)
 

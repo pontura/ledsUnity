@@ -22,6 +22,10 @@ class Bullet:
         self.isOn = True
 
     def OnUpdate(self, deltaTime):
+        
+        w = self.width
+        n = self.numLeds
+        
         if self.characterID == 1:
             self.pos -= deltaTime * self.speed
             if self.pos < 0:
@@ -29,17 +33,17 @@ class Bullet:
                 return
         else:
             self.pos += deltaTime * self.speed
-            if self.pos > self.numLeds - 1:
+            if self.pos > n - 1:
                 self.isOn = False
                 return
 
         self.ledId = int(self.pos)
-        thisLed = self.ledId - int(self.width / 2)
-        for i in range(self.width):
+        thisLed = self.ledId - int(w / 2)
+        for i in range(w):
             if thisLed < 0:
-                thisLed = self.numLeds + thisLed
-            elif thisLed >= self.numLeds:
-                thisLed = thisLed - self.numLeds
+                thisLed =  + thisLed
+            elif thisLed >= n:
+                thisLed = thisLed - n
             self.leds[i] = thisLed
             thisLed += 1
 
