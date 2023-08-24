@@ -3,22 +3,35 @@ import machine
 import time
 import character, shoots, enemies, audio
 import FPS
-import leds
+#import leds
+from neopixel import Neopixel
 
-deltaTime = 0.03
 # deltaTime = 0.03
             
 class BoublesGame:
 #     numLeds = 300
-    numLeds = 150
+    numLeds = 300
     chararter_width = 10
-    myLeds = leds.Leds()
+#     myLeds = leds.Leds()
     audio = audio.Audio()
     ch = 1
     wonCh = 0
+    deltaTime = 0.03
+    
+    strip = Neopixel(numLeds, 0, 22, "RGBW")
+    strip.brightness(42)
+    
+    red = (255, 0, 0)
+    orange = (255, 165, 0)
+    yellow = (255, 150, 0)
+    green = (0, 255, 0)
+    blue = (0, 0, 255)
+    indigo = (75, 0, 130)
+    violet = (138, 43, 226)
+    colors_rgb = (red, orange, yellow, green, blue, indigo, violet)
     
     def Init(self):
-        self.myLeds.Init()
+#         self.myLeds.Init()
         self.delayToAdd = 0.25
         self.minDelayToAdd = 0.04
         self.speed = 0.002
@@ -35,7 +48,7 @@ class BoublesGame:
         self.Init()
         self.colors = [1,2,3,4,5,6]
         self.enemies = enemies.Enemies()
-        self.enemies.Init(self, self.chararter_width, self.numLeds)
+        self.enemies.Init(self, self.chararter_width, self.numLeds, self.colors)
         self.shoots = shoots.Shoots()
         self.shoots.Init(self, self.numLeds)
         self.characters = []
@@ -54,13 +67,14 @@ class BoublesGame:
 
         self.Restart()
 
-    def Update(self, deltaTime):
-        self.OnUpdate(deltaTime)
+    @micropython.viper 
+    def Update(self):
+        self.OnUpdate()
         self.characters[0].Draw(self.numLeds)
         self.characters[1].Draw(self.numLeds)
         self.SendData()
 
-    def Shoot(self, characterID):
+    def Shoot(self, characterID : int):
         if self.enemies.state == 3:
             return
         self.audio.Fire()
@@ -104,12 +118,14 @@ class BoublesGame:
         self.enemies.Restart()
         self.shoots.Restart()
 
-    def OnUpdate(self, deltaTime):
+    ch = 1
+    
+    def OnUpdate(self):
         
-        self.audio.OnUpdate(deltaTime)
+        self.audio.OnUpdate(self.deltaTime)
         
-        self.seconds += deltaTime
-        self.timer += deltaTime
+        self.seconds += self.deltaTime
+        self.timer += self.deltaTime
         
         
         if self.enemies.state == 0:
@@ -131,40 +147,52 @@ class BoublesGame:
                     self.audio.Tick()
                 self.enemies.UpdateDraw(self.ch, self.centerLedID)
         elif self.enemies.state == 3: #3: dead!
+            #if self.timer>0.5:
             if self.wonCh == 1 and self.centerLedID>0:
                 self.centerLedID = self.centerLedID-1
-            elif  self.centerLedID < self.numLeds-1:
+            elif  self.centerLedID < self.numLeds-2:
                 self.centerLedID = self.centerLedID+1
+#                 self.enemies.AnimDead(deltaTime, self.centerLedID, self.wonCh, False)
+#             else:
+            self.enemies.AnimDead(self.deltaTime, self.centerLedID, self.wonCh, True)
                 
-            self.enemies.AnimDead(deltaTime, self.centerLedID, self.wonCh)
+
         else:
             self.enemies.AnimHit()
             self.timer = self.delayToAdd
-        
-        self.enemies.CleanLeds(self.centerLedID, self.from_range, self.to_range)
+                    
+        self.enemies.CleanLeds(self.centerLedID, self.from_range, self.to_range, self.ch, 0)
         
         if self.enemies.state != 3:
-            self.shoots.OnUpdate(self.centerLedID, len(self.enemies.data), len(self.enemies.data2), deltaTime)
+            self.shoots.OnUpdate(self.centerLedID, len(self.enemies.data), len(self.enemies.data2), self.deltaTime)
             
             
     def LoopNote(self, note : float):
         self.audio.LoopNote(note)
     
+    @micropython.viper 
     def SendData(self):
-#       fps.Update()
-#       self.DrawLeds()
-        self.DrawDebug()
+        fps.Update()
+        self.strip.show()
+#         self.DrawLeds()
+#        self.DrawDebug()
         
     def DrawLeds(self):
+        
+        
         i = 0
         for c in self.ledsData:
             a = c-int(c)
-            if a>0:
-                self.myLeds.SetLedAlpha(int(c), i, a)
-            else:
-                self.myLeds.SetLed(c, i)
+#             if a>0:
+#                 self.myLeds.SetLedAlpha(int(c), i, a)
+#             else:
+#                 self.myLeds.SetLed(c, i)
+            self.strip.set_pixel(i, self.colors_rgb[c])
             i = i+1
-        self.myLeds.Send()
+        
+        self.strip.show()
+                
+#         self.myLeds.Send()
         
     def DrawDebug(self):
         s = "".join(str(int(n)) for n in self.ledsData)
@@ -211,7 +239,7 @@ while True:
         ch2_b2_pressed = False
         
 
-    game.Update(deltaTime)
+    game.Update()
     #time.sleep(0.03)
 
 

@@ -12,7 +12,6 @@ class Clips:
     def LoopNote(self, note:float):
         f = 500 + (note*5000)
         self.play_tone(f, 0.95)
-        print("loop ", f)
         
     def Tick_init(self):
         self.start_value = 300        
