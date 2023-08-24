@@ -72,7 +72,8 @@ class Leds:
         c = self.GetColor(colorID)                 
         self.SetPixelBrighteness(c, id, a)
         
-    def GetColor(self, colorID):
+    @micropython.viper 
+    def GetColor(self, colorID : int):
         c = ""
         if colorID == 10:
             c = self.white

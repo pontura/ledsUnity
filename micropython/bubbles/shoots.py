@@ -19,7 +19,7 @@ class Shoots:
                 e.OnUpdate(deltaTime)
                 if e.isOn:
                     c = e.color
-                    self.game.SetLed(e.ledId, c, e.alpha)
+                    self.game.SetLedAlpha(e.ledId, c, e.alpha)
 #                     self.game.ledsData[e.ledId] = c+e.alpha
 
         max_data1 = data1Count + centerLedID

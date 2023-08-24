@@ -177,8 +177,12 @@ class BoublesGame:
 #         self.DrawLeds()
 #        self.DrawDebug()
         self.myLeds.Send()
-
-    def SetLed(self, l, c, a = 0):
+        
+    @micropython.viper 
+    def SetLed(self, l :int , c :int):
+        self.myLeds.SetLed(c, l)
+            
+    def SetLedAlpha(self, l , c , a = 0):
         a = c-int(c)
         if a>0:
             self.myLeds.SetLedAlpha(int(c), l, a)

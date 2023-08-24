@@ -58,23 +58,20 @@ class Enemies:
         self.add_line(ch)
         self.add_line(ch)
         self.Draw(centerLedID)
-
+        
     def CleanLeds(self, centerLedID: int, from_: int, to: int, ch:int , c:int):
         self.centerLedID = centerLedID
         c = 0
-      #  c = 1+0.01
-    #         c1 = self.colors[c1] + 0.1
-    #         c2 = self.colors[c2] + 0.1
         if ch == 1:
             firstMid = centerLedID - len(self.data2)
 #             self.game.strip.set_pixel_line(from_, firstMid, (0,0,0))
             for a in range(from_, firstMid):
-                self.game.SetLed(a, c)
+                self.game.SetLedAlpha(a, c, 0.01)
         else:
             lastMid = centerLedID + len(self.data)            
 #             self.game.strip.set_pixel_line(lastMid, to, (0,0,0))
             for a in range(lastMid, to):
-                self.game.SetLed(a, c)
+                self.game.SetLedAlpha(a, c, 0.01)
 
     def Draw(self, centerLedID : int):
         ledId = 0
@@ -234,14 +231,14 @@ class Enemies:
             for colorID in self.data:
                 c = self.colors[colorID]                
                 ledID = ledId + centerLedID          
-                self.SetLed(ledID,c+0.1)
+                self.game.SetLedAlpha(ledID,c, 0.1)
                 ledId += 1
 
             ledId = 0
             for colorID in self.data2:            
                 c = self.colors[colorID]                
                 ledID = centerLedID - ledId
-                self.SetLed(ledID,c+0.1)
+                self.game.SetLedAlpha(ledID,c, 0.1)
                 ledId += 1
                 
         elif(self.deadTimer<0.2):
@@ -251,26 +248,18 @@ class Enemies:
             for colorID in self.data:
                 c = self.colors[colorID]                
                 ledID = ledId + centerLedID
-                self.SetLed(ledID,c)
+                self.game.SetLed(ledID,c)
                 ledId += 1
 
             ledId = 0
             for colorID in self.data2:            
                 c = self.colors[colorID]                
                 ledID = centerLedID - ledId
-                self.SetLed(ledID,c)
+                self.game.SetLed(ledID,c)
                 ledId += 1
                 
         else:
             self.deadTimer = 0
-            
-    def SetLed(self, ledID, c):
-        if ledID<0:
-            return
-        elif ledID>self.numLeds:
-            return
-        self.SetLed(ledID,c)
-#         self.game.ledsData[ledID] = c
         
     def PlayLoopDeath(self, on : bool):
         v = 0
