@@ -19,7 +19,8 @@ class Shoots:
                 e.OnUpdate(deltaTime)
                 if e.isOn:
                     c = e.color
-                    self.game.ledsData[e.ledId] = c+e.alpha
+                    self.game.SetLed(e.ledId, c, e.alpha)
+#                     self.game.ledsData[e.ledId] = c+e.alpha
 
         max_data1 = data1Count + centerLedID
         max_data2 = centerLedID - data2Count
@@ -34,7 +35,8 @@ class Shoots:
                             e.Collide()
                             return
                         else:
-                            self.game.ledsData[l] = self.game.colors[color]
+                            self.game.SetLed(l, color)
+#                             self.game.ledsData[l] = self.game.colors[color]
 
     def AddBullet(self, characterID, ledID, color):
         for b in self.bullets:

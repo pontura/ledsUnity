@@ -67,14 +67,14 @@ class Enemies:
     #         c2 = self.colors[c2] + 0.1
         if ch == 1:
             firstMid = centerLedID - len(self.data2)
-            self.game.strip.set_pixel_line(from_, firstMid, (0,0,0))
-#             for a in range(from_, firstMid):
-#                 self.game.ledsData[a] = c
+#             self.game.strip.set_pixel_line(from_, firstMid, (0,0,0))
+            for a in range(from_, firstMid):
+                self.game.SetLed(a, c)
         else:
             lastMid = centerLedID + len(self.data)            
-            self.game.strip.set_pixel_line(lastMid, to, (0,0,0))
-#             for a in range(lastMid, to):
-#                 self.game.ledsData[a] = c
+#             self.game.strip.set_pixel_line(lastMid, to, (0,0,0))
+            for a in range(lastMid, to):
+                self.game.SetLed(a, c)
 
     def Draw(self, centerLedID : int):
         ledId = 0
@@ -86,8 +86,7 @@ class Enemies:
             if ledID > self.numLeds - self.chararter_width:
                 self.game.Win(2)
                 return
-            
-            self.game.strip.set_pixel(ledID, (255,0,0))
+            self.game.SetLed(ledID, c)
 #             self.game.ledsData[ledID] = c
             ledId += 1
 
@@ -99,7 +98,8 @@ class Enemies:
             if ledID < self.chararter_width:
                 self.game.Win(1)
                 return
-            self.game.ledsData[ledID] = c
+            self.game.SetLed(ledID, c)
+#             self.game.ledsData[ledID] = c
             ledId += 1
             
     def AnimHit(self):
@@ -269,7 +269,8 @@ class Enemies:
             return
         elif ledID>self.numLeds:
             return
-        self.game.ledsData[ledID] = c
+        self.SetLed(ledID,c)
+#         self.game.ledsData[ledID] = c
         
     def PlayLoopDeath(self, on : bool):
         v = 0

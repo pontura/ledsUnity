@@ -45,15 +45,19 @@ class Character:
             f = numLeds - 1 - self.wa
             t = numLeds
             for a in range( f, t):
-                if a >= numLeds - 2:
-                    self.game.ledsData[a] = self.game.colors[self.color2]
+                if a >= numLeds - 2:                    
+                    self.game.SetLed(a, self.color2)
+#                     self.game.ledsData[a] = self.game.colors[self.color2]
                 else:
-                    self.game.ledsData[a] = self.game.colors[self.color]
+                    self.game.SetLed(a, self.color)
+#                     self.game.ledsData[a] = self.game.colors[self.color]
         else:
             f = 0
             t = self.wa
             for a in range(f, t):
                 if a > 2:
-                    self.game.ledsData[a] = self.game.colors[self.color]
+                    self.game.SetLed(a, self.color)
+#                     self.game.ledsData[a] = self.game.colors[self.color]
                 else:
-                    self.game.ledsData[a] = self.game.colors[self.color2]  
+                    self.game.SetLed(a, self.color2)
+#                     self.game.ledsData[a] = self.game.colors[self.color2]  

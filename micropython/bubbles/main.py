@@ -3,8 +3,8 @@ import machine
 import time
 import character, shoots, enemies, audio
 import FPS
-#import leds
-from neopixel import Neopixel
+import leds
+# from neopixel import Neopixel
 
 # deltaTime = 0.03
             
@@ -12,14 +12,14 @@ class BoublesGame:
 #     numLeds = 300
     numLeds = 300
     chararter_width = 10
-#     myLeds = leds.Leds()
+    myLeds = leds.Leds()
     audio = audio.Audio()
     ch = 1
     wonCh = 0
     deltaTime = 0.03
     
-    strip = Neopixel(numLeds, 0, 22, "RGBW")
-    strip.brightness(42)
+#     strip = Neopixel(numLeds, 0, 22, "RGBW")
+#     strip.brightness(42)
     
     red = (255, 0, 0)
     orange = (255, 165, 0)
@@ -31,7 +31,7 @@ class BoublesGame:
     colors_rgb = (red, orange, yellow, green, blue, indigo, violet)
     
     def Init(self):
-#         self.myLeds.Init()
+        self.myLeds.Init()
         self.delayToAdd = 0.25
         self.minDelayToAdd = 0.04
         self.speed = 0.002
@@ -173,26 +173,17 @@ class BoublesGame:
     @micropython.viper 
     def SendData(self):
         fps.Update()
-        self.strip.show()
+#         self.strip.show()
 #         self.DrawLeds()
 #        self.DrawDebug()
-        
-    def DrawLeds(self):
-        
-        
-        i = 0
-        for c in self.ledsData:
-            a = c-int(c)
-#             if a>0:
-#                 self.myLeds.SetLedAlpha(int(c), i, a)
-#             else:
-#                 self.myLeds.SetLed(c, i)
-            self.strip.set_pixel(i, self.colors_rgb[c])
-            i = i+1
-        
-        self.strip.show()
-                
-#         self.myLeds.Send()
+        self.myLeds.Send()
+
+    def SetLed(self, l, c, a = 0):
+        a = c-int(c)
+        if a>0:
+            self.myLeds.SetLedAlpha(int(c), l, a)
+        else:
+            self.myLeds.SetLed(c, l)
         
     def DrawDebug(self):
         s = "".join(str(int(n)) for n in self.ledsData)
