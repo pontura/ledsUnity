@@ -4,7 +4,7 @@ import random
 
 class Clips:
     
-    buzzer = PWM(Pin(2))
+    buzzer = PWM(Pin(0))
     timer = 0
     start_value = 400
     clipState = 0

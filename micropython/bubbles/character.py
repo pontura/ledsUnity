@@ -3,10 +3,8 @@ import urandom
 class Character:
     global game
     width = 0
-    wa = 0
     characterID = 0
     ledId = 0
-    totalColors = 0
     color = 0
     color2 = 0
     
@@ -15,49 +13,36 @@ class Character:
         self.width = width
         self.characterID = characterID
         self.ledId = ledID
-        self.Restart()
         
     def Restart(self):
-        self.wa = 1
-        self.totalColors = self.game.totalColors
         self.state = 1  
-        self.color = urandom.randint(0, self.totalColors - 1)
-        self.color2 = self.color
+        self.color2 = urandom.randint(1, self.game.totalColors)
         self.ChangeColors()
 
     def ChangeColors(self):
-        self.wa = 1
-        self.color = self.color2
-        self.SetSecondaryColor()
-
-    def SetSecondaryColor(self):
-        self.color2 = urandom.randint(0, self.game.totalColors - 1)  
-        if self.color2 == self.color:
-            self.SetSecondaryColor()            
+        c = self.color2
+        self.color = c
+        self.color2 = c+1
+        
+        if self.color2 > self.game.totalColors:
+            self.color2 = 1
 
     def Draw(self, numLeds):
-        
-        if self.wa < self.width:
-            self.wa = self.wa+1
-            
-        w = self.wa/2
         if self.characterID == 1:
-            f = numLeds - 1 - self.wa
-            t = numLeds
-            for a in range( f, t):
-                if a >= numLeds - 2:                    
-                    self.game.SetLed(a, self.color2)
-#                     self.game.ledsData[a] = self.game.colors[self.color2]
-                else:
-                    self.game.SetLed(a, self.color)
-#                     self.game.ledsData[a] = self.game.colors[self.color]
+            c1 = numLeds - 2
+            c2 = numLeds   -1       
         else:
-            f = 0
-            t = self.wa
-            for a in range(f, t):
-                if a > 2:
-                    self.game.SetLed(a, self.color)
-#                     self.game.ledsData[a] = self.game.colors[self.color]
-                else:
-                    self.game.SetLed(a, self.color2)
-#                     self.game.ledsData[a] = self.game.colors[self.color2]  
+            c2= 0
+            c1= 1
+        self.game.SetLed(c1, self.color)
+        self.game.SetLed(c2, self.color2)
+        
+    def Hide(self, numLeds):
+        if self.characterID == 1:
+            c1 = numLeds - 2
+            c2 = numLeds   -1       
+        else:
+            c2= 0
+            c1= 1
+        self.game.SetLed(c1, 0)
+        self.game.SetLed(c2, 0)

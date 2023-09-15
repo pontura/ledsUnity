@@ -3,7 +3,7 @@ import time
 from neopixel import Neopixel
 
 numpix = 60
-strip = Neopixel(numpix, 0, 0, "GRB")
+strip = Neopixel(numpix, 0, 22, "GRB")
 
 hue = 0
 while(True):

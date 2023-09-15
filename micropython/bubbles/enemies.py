@@ -19,13 +19,12 @@ class Enemies:
         self.bubbleTotalWidth = 8
         self.bbw_ch1 = 0
         self.bbw_ch2 = 0
-        self.currentColor = 0
-        self.currentColor2 = 0
+        self.currentColor = 1
+        self.currentColor2 = 2
         self.game = None
         self.centerLedID = 0
 
-    def Init(self, game, chararter_width, numLeds, _c):        
-        self.colors = _c
+    def Init(self, game, chararter_width, numLeds):    
         self.chararter_width = chararter_width
         self.game = game
         self.data = []
@@ -61,41 +60,36 @@ class Enemies:
         
     def CleanLeds(self, centerLedID: int, from_: int, to: int, ch:int , c:int):
         self.centerLedID = centerLedID
-        c = 0
-        if ch == 1:
+        if ch == 2:
             firstMid = centerLedID - len(self.data2)
 #             self.game.strip.set_pixel_line(from_, firstMid, (0,0,0))
             for a in range(from_, firstMid):
-                self.game.SetLedAlpha(a, c, 0.01)
+                self.SetLed2(a, c)
         else:
             lastMid = centerLedID + len(self.data)            
 #             self.game.strip.set_pixel_line(lastMid, to, (0,0,0))
             for a in range(lastMid, to):
-                self.game.SetLedAlpha(a, c, 0.01)
+                self.SetLed2(a, c)
 
     def Draw(self, centerLedID : int):
         ledId = 0
         c = 0
-        for colorID in self.data:
-            c = self.colors[colorID]
-                
+        for colorID in self.data:                
             ledID = ledId + centerLedID
             if ledID > self.numLeds - self.chararter_width:
                 self.game.Win(2)
                 return
-            self.game.SetLed(ledID, c)
+            self.SetLed(ledID, colorID)
 #             self.game.ledsData[ledID] = c
             ledId += 1
 
         ledId = 0
-        for colorID in self.data2:            
-            c = self.colors[colorID]
-                
+        for colorID in self.data2:                
             ledID = centerLedID - ledId
             if ledID < self.chararter_width:
                 self.game.Win(1)
                 return
-            self.game.SetLed(ledID, c)
+            self.SetLed(ledID, colorID)
 #             self.game.ledsData[ledID] = c
             ledId += 1
             
@@ -183,83 +177,114 @@ class Enemies:
                 self.data.append(color)
             else:
                 self.data2.append(color)
-                
         self.Draw(self.centerLedID)
 
     def set_new_bubble1(self):
-        newColor = urandom.randint(0, self.game.totalColors - 1)
+        newColor = urandom.randint(1, self.game.totalColors)
         if newColor == self.currentColor:
             self.set_new_bubble1()
         else:
             self.currentColor = newColor
 
     def set_new_bubble2(self):
-        newColor = urandom.randint(0, self.game.totalColors - 1)
+        newColor = urandom.randint(1, self.game.totalColors)
         if newColor == self.currentColor2:
             self.set_new_bubble2()
         else:
             self.currentColor2 = newColor
     
-    
+    animState = 0
+    loops = 0
     def GameOver(self, ch):
         self.state = 3
+        self.animState = 0
+        self.loops = 0
+        self.deadTimer = 0
         
     deadTimer = 0
     def AnimDead(self, deltaTime, centerLedID, ch, animated: bool):
-        if(animated == True):
-            if ch == 1:           
-                if len(self.data2)> 0:
-                    self.data2.pop()
-                elif len(self.data)> 0:
-                    self.data.pop()
+        if self.animState == 0:
+            if(self.deadTimer<0.4):
+                self.game.LoopNote(self.deadTimer/50)
+            if(self.deadTimer<0.2):
+                if(ch == 2):
+                    ledId = 0            
+                    for colorID in self.data:
+                        print (centerLedID)
+                        ledID = ledId + centerLedID
+                        self.SetLed(ledID,colorID)
+                        ledId += 1
                 else:
-                    self.game.Restart()
-                    return                
-            elif ch == 2:         
-                if len(self.data)> 0:
-                    self.data.pop()
-                elif len(self.data2)> 0:
-                    self.data2.pop()
+                    ledId = 0
+                    for colorID in self.data2:                 
+                        ledID = centerLedID - ledId
+                        self.SetLed(ledID,colorID)
+                        ledId += 1
+            elif(self.deadTimer<0.4):
+                if(ch == 2):
+                    ledId = 0            
+                    for colorID in self.data:             
+                        ledID = ledId + centerLedID
+                        self.SetLed2(ledID,colorID)
+                        ledId += 1
                 else:
-                    self.game.Restart()
-                    return
+                    ledId = 0
+                    for colorID in self.data2:                 
+                        ledID = centerLedID - ledId
+                        self.SetLed2(ledID,colorID)
+                        ledId += 1
+                    
+            elif(self.deadTimer>0.6):
+                if self.loops > 4:
+                    self.animState = 1
+                else:                    
+                    self.loops = self.loops+1
+                self.deadTimer = 0
+                
+            self.deadTimer += deltaTime
+            return
+        if(animated == True):   
+            if len(self.data2)> 0:
+                self.data2.pop()
+            if len(self.data2)> 0:
+                self.data2.pop()
+            if len(self.data)> 0:
+                self.data.pop()            
+            if len(self.data)> 0:
+                self.data.pop()
+                              
+            if len(self.data2) <= 0 and len(self.data) <= 0:
+                self.game.GotoState(1) #intro
+                return  
             
         self.deadTimer += deltaTime
-        if(self.deadTimer<0.1):            
+        
+        if(self.deadTimer<0.2):
+                  
             self.PlayLoopDeath(True)
             ledId = 0            
-            for colorID in self.data:
-                c = self.colors[colorID]                
-                ledID = ledId + centerLedID          
-                self.game.SetLedAlpha(ledID,c, 0.1)
-                ledId += 1
-
-            ledId = 0
-            for colorID in self.data2:            
-                c = self.colors[colorID]                
-                ledID = centerLedID - ledId
-                self.game.SetLedAlpha(ledID,c, 0.1)
-                ledId += 1
-                
-        elif(self.deadTimer<0.2):
-                  
-            self.PlayLoopDeath(False)
-            ledId = 0            
-            for colorID in self.data:
-                c = self.colors[colorID]                
+            for colorID in self.data:             
                 ledID = ledId + centerLedID
-                self.game.SetLed(ledID,c)
+                self.SetLed(ledID,colorID)
                 ledId += 1
 
             ledId = 0
-            for colorID in self.data2:            
-                c = self.colors[colorID]                
+            for colorID in self.data2:                 
                 ledID = centerLedID - ledId
-                self.game.SetLed(ledID,c)
+                self.SetLed(ledID,colorID)
                 ledId += 1
                 
         else:
+            self.PlayLoopDeath(False)
             self.deadTimer = 0
+            
+    def SetLed(self, l : int, c: int):
+        if l > 0 and l < self.numLeds:
+            self.game.SetLed(l,c)
+            
+    def SetLed2(self, l : int, c: int):
+        if l > 0 and l < self.numLeds:
+            self.game.SetLed2(l,c)
         
     def PlayLoopDeath(self, on : bool):
         v = 0
@@ -270,3 +295,4 @@ class Enemies:
         self.game.LoopNote(v)
             
         
+

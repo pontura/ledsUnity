@@ -7,7 +7,7 @@ class ExplotionParticle:
         self.Restart(ledId, dir, color)
 
     def Restart(self, ledId, dir, color):        
-        self.speed = urandom.uniform(20, 120)
+        self.speed = urandom.uniform(20, 220)
         self.color = 10
         self.oColor = color
         self.timer = 0

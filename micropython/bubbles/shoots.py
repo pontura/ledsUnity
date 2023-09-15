@@ -30,7 +30,7 @@ class Shoots:
                 e.OnUpdate(deltaTime)
                 if e.isOn:
                     for l in e.leds:
-                        if (e.characterID == 1 and l <= max_data1) or (e.characterID == 2 and l >= max_data2):
+                        if (e.characterID == 1 and l <= max_data1-1) or (e.characterID == 2 and l >= max_data2+1):
                             self.game.CollideWith(color, e.characterID)
                             e.Collide()
                             return
@@ -39,6 +39,7 @@ class Shoots:
 #                             self.game.ledsData[l] = self.game.colors[color]
 
     def AddBullet(self, characterID, ledID, color):
+        
         for b in self.bullets:
             if not b.isOn:
                 b.Restart(characterID, ledID, color)
@@ -51,9 +52,8 @@ class Shoots:
         for a in range(from_range, to_range):
             self.AddExplotionParticle(a, characterID, color)
 
-    def AddExplotionParticle(self, ledID, characterID, color):
+    def AddExplotionParticle(self, ledID, characterID, c):
         dir = 1 if characterID == 1 else -1
-        c = self.game.colors[color]
         for ex in self.explotions:
             if not ex.isOn:
                 ex.Restart(ledID, dir, c)

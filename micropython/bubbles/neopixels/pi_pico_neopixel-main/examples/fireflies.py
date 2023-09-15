@@ -2,9 +2,9 @@ import time
 from neopixel import Neopixel
 import random
 
-numpix = 60  # Number of NeoPixels
+numpix = 300  # Number of NeoPixels
 # Pin where NeoPixels are connected
-strip = Neopixel(numpix, 1, 1, "GRB")
+strip = Neopixel(numpix, 1, 22, "GRB")
 
 colors_rgb = [
     (232, 100, 255),  # Purple
