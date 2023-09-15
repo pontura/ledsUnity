@@ -1,7 +1,7 @@
 import machine
 import time
 import character, shoots, enemies, audio
-import FPS
+# import FPS
 import leds
 import intro
 # from neopixel import Neopixel
@@ -37,6 +37,7 @@ class BoublesGame:
         self.seconds = 0
         self.timer = 0
         self.centerLedID = self.numLeds // 2
+        self.audio.Init()
 
     def Start(self):
         self.Init()
@@ -70,16 +71,15 @@ class BoublesGame:
 
         self.myLeds.Send()
 #        self.DrawDebug()
-        fps.Update()
+#         fps.Update()
 
     def Shoot(self, characterID : int):
         if self.state == 1:
-            print ("shoot", self.state)
             self.GotoState(2)
             return
         if self.enemies.state == 3:
             return
-        self.audio.Fire()
+        self.audio.Fire(characterID)
         ch = self.characters[characterID - 1]
         ledID = ch.ledId
         if characterID == 1:
@@ -97,7 +97,7 @@ class BoublesGame:
         if self.enemies.state == 3:
             return
         if(playSound):            
-            self.audio.Swap()   
+            self.audio.Swap(characterID)   
         self.characters[characterID - 1].ChangeColors()
 
     def Win(self, ch):
@@ -106,7 +106,7 @@ class BoublesGame:
         self.timer = 0
 
     def AddExplotion(self, from_range, to_range, characterID, color):
-        self.audio.Explote()
+        self.audio.Explote(characterID)
         self.shoots.AddExplotion(from_range, to_range, characterID, color)
 
     def CollideWith(self, color, characterID):
@@ -115,8 +115,8 @@ class BoublesGame:
     def OnReward(self, characterID, reward):
         print("OnReward", characterID)
         
-    def Wrong(self):        
-        self.audio.Wrong()
+    def Wrong(self, ch : int):        
+        self.audio.Wrong(ch)
 
     def Restart(self):
         print("RESTART")
@@ -151,11 +151,13 @@ class BoublesGame:
                         self.totalColors += 1
                     self.seconds = 0
                 self.timer = 0
+                
                 if self.chTick == 1:
                     self.chTick = 2
                 else:
-                    self.chTick = 1
-                    self.audio.Tick()
+                    self.chTick = 1                    
+                    self.audio.Tick(self.chTick)
+                
                 self.enemies.UpdateDraw(self.chTick, self.centerLedID)
                 
             self.characters[0].Draw(self.numLeds)
@@ -192,8 +194,8 @@ class BoublesGame:
             self.centerColor = 0
         self.SetLed(self.centerLedID, self.centerColor)
         
-    def LoopNote(self, note : float):
-        self.audio.LoopNote(note)
+    def LoopNote(self, note : float, ch : int):
+        self.audio.LoopNote(note, ch)
     
         
     @micropython.viper 
@@ -218,8 +220,8 @@ class BoublesGame:
         self.Restart()
         self.state = state
         print("New state", self.state)        
-        self.audio.Stop()   
-    
+        self.audio.Stop(1)        
+        self.audio.Stop(2) 
         
 
 game = BoublesGame()
@@ -234,7 +236,7 @@ ch1_b2_pressed = False
 ch2_b2 = machine.Pin(12, machine.Pin.IN, machine.Pin.PULL_UP )
 ch2_b2_pressed = False
 
-fps = FPS.fps()
+# fps = FPS.fps()
 
 def tt():
     return float(round(time.time() * 1000))

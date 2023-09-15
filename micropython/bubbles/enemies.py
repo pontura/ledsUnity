@@ -171,7 +171,7 @@ class Enemies:
         self.state = characterID
 
     def add_colors(self, color, characterID):
-        self.game.Wrong()
+        self.game.Wrong(characterID)
         for _ in range(self.bubbleTotalWidth):
             if characterID == 1:
                 self.data.append(color)
@@ -195,7 +195,9 @@ class Enemies:
     
     animState = 0
     loops = 0
+    ch  =1
     def GameOver(self, ch):
+        self.ch = ch
         self.state = 3
         self.animState = 0
         self.loops = 0
@@ -203,9 +205,10 @@ class Enemies:
         
     deadTimer = 0
     def AnimDead(self, deltaTime, centerLedID, ch, animated: bool):
+        self.ch = ch
         if self.animState == 0:
             if(self.deadTimer<0.4):
-                self.game.LoopNote(self.deadTimer/50)
+                self.game.LoopNote(self.deadTimer/50, ch)
             if(self.deadTimer<0.2):
                 if(ch == 2):
                     ledId = 0            
@@ -292,7 +295,7 @@ class Enemies:
             v =  (len(self.data2) + len(self.data)) / self.numLeds
         else:
             v = 0
-        self.game.LoopNote(v)
+        self.game.LoopNote(v, self.ch)
             
         
 
