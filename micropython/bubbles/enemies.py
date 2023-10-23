@@ -61,12 +61,12 @@ class Enemies:
     def CleanLeds(self, centerLedID: int, from_: int, to: int, ch:int , c:int):
         self.centerLedID = centerLedID
         if ch == 2:
-            firstMid = centerLedID - len(self.data2)
+            firstMid = centerLedID - len(self.data2)-2
 #             self.game.strip.set_pixel_line(from_, firstMid, (0,0,0))
             for a in range(from_, firstMid):
                 self.SetLed2(a, c)
         else:
-            lastMid = centerLedID + len(self.data)            
+            lastMid = centerLedID + len(self.data)+2        
 #             self.game.strip.set_pixel_line(lastMid, to, (0,0,0))
             for a in range(lastMid, to):
                 self.SetLed2(a, c)
@@ -75,7 +75,7 @@ class Enemies:
         ledId = 0
         c = 0
         for colorID in self.data:                
-            ledID = ledId + centerLedID
+            ledID = ledId + centerLedID+2
             if ledID > self.numLeds - self.chararter_width:
                 self.game.Win(2)
                 return
@@ -85,7 +85,7 @@ class Enemies:
 
         ledId = 0
         for colorID in self.data2:                
-            ledID = centerLedID - ledId
+            ledID = centerLedID - ledId-2
             if ledID < self.chararter_width:
                 self.game.Win(1)
                 return
@@ -298,4 +298,5 @@ class Enemies:
         self.game.LoopNote(v, self.ch)
             
         
+
 

@@ -62,7 +62,8 @@ class Leds:
     cyan2 = 0
     magenta2 = 0
     
-    def Init(self):
+    def Init(self, NUM_LEDS):
+        self.NUM_LEDS = NUM_LEDS
         self.dimmer_ar = array.array("I", [0 for _ in range(self.NUM_LEDS)])
         
         self.bgColor = self.CreateColor((0,0,0))
@@ -88,6 +89,27 @@ class Leds:
     @micropython.viper 
     def Send(self):
         self.sm.put(self.dimmer_ar, 8)
+#         s = "".join(str(self.GetStr(n)) for n in self.dimmer_ar)
+#         print(s)
+         
+    def GetStr(self, c):
+        if c == self.black:
+            return "0"
+        elif c == self.white:
+            return "9"
+        elif c == self.red:
+            return "1"
+        elif c == self.green:
+            return "2"
+        elif c == self.blue:
+            return "3"
+        elif c == self.yellow:
+            return "4"
+        elif c == self.cyan:
+            return "5"
+        elif c == self.magenta:
+            return "6"
+        return "x"
       
     @micropython.viper 
     def SetLed(self, colorID : int, id : int):
@@ -162,6 +184,7 @@ class Leds:
 
     def setColor(self, color):
         return (color[1]<<16) + (color[0]<<8) + color[2]
+
 
 
 

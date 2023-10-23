@@ -4,15 +4,13 @@ import character, shoots, enemies, audio
 # import FPS
 import leds
 import intro
-# from neopixel import Neopixel
-
-# deltaTime = 0.03
             
 class BoublesGame:
-#     numLeds = 300
-    numLeds = 299
+    numLeds = 300
+#     numLeds = 150
     chararter_width = 2
     myLeds = leds.Leds()
+    myLeds.Init(numLeds)
     audio = audio.Audio()
     intro = intro.Intro()
     ch = 1
@@ -21,11 +19,7 @@ class BoublesGame:
     centerColor = 0
     state = 1 #1=intro 2=game
     
-#     strip = Neopixel(numLeds, 0, 22, "RGBW")
-#     strip.brightness(42)
-        
     def Init(self):
-        self.myLeds.Init()
         self.delayToAdd = 0.4
         self.minDelayToAdd = 0.04
         self.speed = 0.001
@@ -44,7 +38,7 @@ class BoublesGame:
         self.colors = [1,2,3,4,5,6]
         self.enemies = enemies.Enemies()
         self.enemies.Init(self, self.chararter_width, self.numLeds)
-        self.intro.Init(self)
+        self.intro.Init(self, self.numLeds)
         self.shoots = shoots.Shoots()
         self.shoots.Init(self, self.numLeds)
         self.characters = []
@@ -70,7 +64,7 @@ class BoublesGame:
             self.OnUpdate()
 
         self.myLeds.Send()
-#        self.DrawDebug()
+#         self.DrawDebug()
 #         fps.Update()
 
     def Shoot(self, characterID : int):
@@ -95,10 +89,10 @@ class BoublesGame:
             self.GotoState(2)
             return
         if self.enemies.state == 3:
-            return
+            return  
+        color = self.characters[characterID - 1].ChangeColors()
         if(playSound):            
-            self.audio.Swap(characterID)   
-        self.characters[characterID - 1].ChangeColors()
+            self.audio.Swap(characterID, color) 
 
     def Win(self, ch):
         self.wonCh = ch
@@ -192,7 +186,13 @@ class BoublesGame:
         self.centerColor = self.centerColor+1
         if self.centerColor>self.totalColors:
             self.centerColor = 0
-        self.SetLed(self.centerLedID, self.centerColor)
+            
+        if self.centerLedID+1<self.numLeds:
+            self.SetLed(self.centerLedID+1, self.centerColor)        
+        if self.centerLedID-1>0:
+            self.SetLed(self.centerLedID-1, self.centerColor)
+        self.SetLed(self.centerLedID, 0)
+        
         
     def LoopNote(self, note : float, ch : int):
         self.audio.LoopNote(note, ch)
@@ -210,11 +210,7 @@ class BoublesGame:
         self.myLeds.SetLedColor(l,c)
             
     def SetLedAlpha(self, l :int , c:int , a = 0):
-        self.myLeds.SetLedAlpha(int(c), l, a)
-        
-    def DrawDebug(self):
-        s = "".join(str(int(n)) for n in self.ledsData)
-        print(s)
+        self.myLeds.SetLedAlpha(int(c), l, a)      
         
     def GotoState(self, state : int):
         self.Restart()
@@ -229,44 +225,71 @@ game.Start()
 
 ch1_b1 = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP )
 ch1_b1_pressed = False
-ch2_b1 = machine.Pin(13, machine.Pin.IN, machine.Pin.PULL_UP )
+ch2_b1 = machine.Pin(7, machine.Pin.IN, machine.Pin.PULL_UP )
 ch2_b1_pressed = False
 ch1_b2 = machine.Pin(14, machine.Pin.IN, machine.Pin.PULL_UP )
 ch1_b2_pressed = False
-ch2_b2 = machine.Pin(12, machine.Pin.IN, machine.Pin.PULL_UP )
+ch2_b2 = machine.Pin(6, machine.Pin.IN, machine.Pin.PULL_UP )
 ch2_b2_pressed = False
 
 # fps = FPS.fps()
 
 def tt():
     return float(round(time.time() * 1000))
-    
+
+bfilter = 1
+b1=0
+b2=0
+b3=0
+b4=0
+
 while True:
     if ch1_b1.value() == 1 and ch1_b1_pressed == False:
-        game.Shoot(1)
-        ch1_b1_pressed = True
+        if b1>bfilter:
+            game.Shoot(1)
+            ch1_b1_pressed = True
+        b1 = 0        
     elif ch1_b1.value() == 0 and ch1_b1_pressed == True:
-        ch1_b1_pressed = False        
+        ch1_b1_pressed = False
+    elif ch1_b1.value() == 0 and ch1_b1_pressed == False:
+        b1 = b1+1
+        
+        
     if ch2_b1.value() == 1 and ch2_b1_pressed == False:
-        game.Shoot(2)
-        ch2_b1_pressed = True
+        if b2>bfilter:
+            game.Shoot(2)
+            ch2_b1_pressed = True
+        b2 = 0
     elif ch2_b1.value() == 0 and ch2_b1_pressed == True:        
         ch2_b1_pressed = False
-        ch1b = tt()
+    elif ch2_b1.value() == 0 and ch2_b1_pressed == False:
+        b2 = b2+1
+        
+        
         
     if ch1_b2.value() == 1 and ch1_b2_pressed == False:
-        game.ChangeColors(1, True)     
-        ch1_b2_pressed = True
+        if b3>bfilter:
+            game.ChangeColors(1, True)     
+            ch1_b2_pressed = True
+        b3 = 0
     elif ch1_b2.value() == 0 and ch1_b2_pressed == True:        
-        ch1_b2_pressed = False        
+        ch1_b2_pressed = False
+    elif ch1_b2.value() == 0 and ch1_b2_pressed == False:
+        b3 = b3+1
+        
     if ch2_b2.value() == 1 and ch2_b2_pressed == False:
-        game.ChangeColors(2, True)
-        ch2_b2_pressed = True
+        if b4>bfilter:
+            game.ChangeColors(2, True)
+            ch2_b2_pressed = True
+        b4 = 0
     elif ch2_b2.value() == 0 and ch2_b2_pressed == True:        
         ch2_b2_pressed = False
+    elif ch2_b2.value() == 0 and ch2_b2_pressed == False:
+        b4 = b4+1
         
     game.Update()
-    #time.sleep(0.03)
+#     time.sleep(0.02)
+
 
 
 

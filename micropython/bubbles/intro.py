@@ -14,14 +14,16 @@ class Intro:
 
     num_flashes = 10
 
-    for i in range(num_flashes):
-        pix = random.randint(0, numpix - 1)
-        flash_len = random.randint(min_len, max_len)
-        flashing.append([pix, random.randint(1, max_colors), flash_len, 0, 1])
+    
         
 
-    def Init(self, game):
+    def Init(self, game, numpix):
+        self.numpix = numpix
         self.game = game
+        for i in range(self.num_flashes):
+            self.pix = random.randint(0, numpix - 1)
+            flash_len = random.randint(self.min_len, self.max_len)
+            self.flashing.append([self.pix, random.randint(1, self.max_colors), flash_len, 0, 1])
         
     def OnUpdate(self):
 
@@ -40,3 +42,4 @@ class Intro:
                 self.flashing[i] = [pix, col, flash_len, 0, 1]
             self.flashing[i][3] = self.flashing[i][3] + self.flashing[i][4]
             time.sleep(0.005)
+
