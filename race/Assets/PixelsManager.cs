@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PixelsManager : MonoBehaviour
 {
@@ -9,93 +11,100 @@ public class PixelsManager : MonoBehaviour
     List<Pixel> pixels;
     [SerializeField] Transform container;
     int totalPixels = 300;
-    [SerializeField] int center;
-    [SerializeField] int curve;
+    int center;
+    [SerializeField] float vanishingPointTarget;
+    [SerializeField] float vanishingPoint;
     List<RoadPoint> roadPoints;
-    [Serializable] class RoadPoint
+    [Serializable]
+    class RoadPoint
     {
-        public float z;
+        public float initial_x;
+        public float x;
+        public float width;
     }
 
     float timer;
 
     [SerializeField] float distance_betweenPoints = 0.3f;
     [SerializeField] float speed = 3;
-    [SerializeField] float roadWidth = 20;
     [SerializeField] float aceleration = 20;
+    float distance;
 
     void Start()
     {
+        center = totalPixels / 2;
         pixels = new List<Pixel>();
         roadPoints = new List<RoadPoint>();
-        center = totalPixels / 2;
+        vanishingPoint = totalPixels / 2;
         for (int i = 0; i < totalPixels; i++)
         {
             Pixel p = Instantiate(pixel_to_add, container);
             pixels.Add(p);
         }
+        SetCurve();
     }
+
     void Update()
     {
+        distance += Time.deltaTime;
         timer += Time.deltaTime;
+
         if (timer > distance_betweenPoints)
             AddRoadPoint();
         UpdateRoadPoints();
         Draw();
+        SetVanishingPoint();
     }
     void AddRoadPoint()
     {
         timer = 0;
         RoadPoint rp = new RoadPoint();
-        rp.z = 100;
+        rp.initial_x = vanishingPoint;
+        rp.x = rp.initial_x;
+        rp.width = 1;
         roadPoints.Add(rp);
     }
     void UpdateRoadPoints()
     {
         RoadPoint toRemove = null;
+        int a = 0;
+        int totalRoadPoints = roadPoints.Count;
+        int half = totalPixels / 2;
         foreach (RoadPoint rp in roadPoints)
         {
-            rp.z -= Time.deltaTime * speed;
-            float _aceleration = (100-rp.z) / aceleration;
-            rp.z -= _aceleration;
-            if (rp.z < 0)
+            rp.width += speed * Time.deltaTime;
+            rp.width *= aceleration;
+            rp.x = rp.initial_x + (rp.width * (center - rp.initial_x) / totalPixels);
+            a++;
+            if (rp.width > totalPixels)
                 toRemove = rp;
         }
-        if(toRemove != null) 
+        if (toRemove != null)
             roadPoints.Remove(toRemove);
     }
     private void Draw()
     {
-        int p = center;
         float alpha = 0;
         Color color = Color.white;
-        for (int a = center; a < totalPixels; a++) {
 
-            Pixel pixel = pixels[a];
-            
-            if (IsBorder(p))
-                SetColor(p, Color.red, 1);
-            else
-                SetColor(p, Color.black, 0);
-            p++;
+        for (int a = 0; a < totalPixels; a++)
+        {
+            SetColor(a, Color.black, 0);
         }
-
-        SetColor(center, Color.blue, 1);
+        int totalRoadPoints = roadPoints.Count;
+        int roadPixelID = (int)((float)roadPoints.Count / 1.5f);
+        int id = totalRoadPoints;
         foreach (RoadPoint rp in roadPoints)
         {
-            int pixel = (int)(rp.z * (center) / 100);
-
-            pixel = pixel + (int)(rp.z * (float)curve);
-
-             pixel = (center - pixel) + center;
-
-            int limit = center + (int)roadWidth;
-           
-            if (pixel < center + roadWidth)
+            if (id < roadPixelID)
             {
                 color = Color.blue;
-                alpha = 0.6f;
-                // alpha = ((pixel - center) / roadWidth) / 1.2f;
+                alpha = 1f;
+            }
+            else if (id == roadPixelID)
+            {
+                color = Color.red;
+                alpha = 1;
             }
             else
             {
@@ -103,58 +112,79 @@ public class PixelsManager : MonoBehaviour
                 alpha = 1;
             }
 
-
-            if (pixel == limit)
-            {
-                SetColor(pixel + 1, Color.red, 1);
-                SetColor(pixel + 2, Color.red, 1);
-                SetColor(pixel + 3, Color.red, 1);
-            }
+            if (id == roadPixelID)
+                SetRoadPoint(rp, Color.red, 1, 1);
             else
-                SetColor(pixel, color, 0.5f);
+                SetRoadPoint(rp, color, alpha);
 
-            //150 + ((300 - 150) / 1)
+            if (id >= roadPixelID + (roadPixelID / 2))
+                SetRoadPoint(rp, Color.white, alpha, 1);
+            if (id >= roadPixelID + (roadPixelID / 1.75))
+                SetRoadPoint(rp, Color.white, alpha, 2);
+            if (id >= roadPixelID + (roadPixelID / 1.5))
+                SetRoadPoint(rp, Color.white, alpha, 3);
+            if (id >= roadPixelID + (roadPixelID / 1.3f))
+                SetRoadPoint(rp, Color.white, alpha, 4);
 
-            if (pixel >= center + (totalPixels - center) /2)
-            {
-                SetColor(pixel + 1, Color.white, alpha);
-            }
-            if (pixel >= center + (totalPixels - center) / 1.75)
-            {
-                SetColor(pixel + 2, Color.white, alpha);
-            }
-            if (pixel >= center + (totalPixels - center) / 1.5)
-            {
-                SetColor(pixel + 3, Color.white, alpha);
-            }
-            if (pixel >= center + (totalPixels - center) / 1.3f)
-            {
-                SetColor(pixel + 4, Color.white, alpha);
-            }
+            id--;
         }
-    }
-    bool IsBorder(int p)
-    {
-        if (p == center - (int)roadWidth - 1)
-            return true;
-        else if (p == center + (int)roadWidth + 1)
-            return true;
-        return false;
-    }
-    void Mirrored(int _pixel, Color color, float alpha)
-    {
-        int pixel = center - (_pixel - center);
-        if (pixel < 0) return;
-        pixels[pixel].SetData(color, alpha);
+
+        SetColor((int)vanishingPoint, Color.green, 1);
     }
     void SetColor(int pixel, Color color, float alpha)
     {
         if (pixel < 0) return;
         if (pixel >= pixels.Count) return;
 
-       
-
         pixels[pixel].SetData(color, alpha);
-      //  Mirrored(pixel, color, alpha);
+    }
+    void SetRoadPoint(RoadPoint rp,  Color color, float alpha, int offset = 0)
+    {
+        int pixel_right = (int)rp.x + (int)(rp.width / 2);
+        int pixel_left = (int)rp.x - (int)(rp.width / 2);
+
+        SetColor(pixel_right + offset, color, alpha);
+        SetColor(pixel_left - offset, color, alpha);
+    }
+
+
+    float curveDuration;
+    private float elapsedTime;
+    float curvePosible;
+    void SetCurve()
+    {
+        elapsedTime = 0f;
+        curveDuration = UnityEngine.Random.Range(2, 5);
+        curvePosible = 10 + distance;
+        vanishingPointTarget = vanishingPoint + (int)UnityEngine.Random.Range(-curvePosible, curvePosible);
+        if (vanishingPointTarget > totalPixels - 50) 
+            vanishingPointTarget = totalPixels - 50;
+        else if (vanishingPointTarget < 50)
+            vanishingPointTarget = 50;
+    }
+
+    void SetVanishingPoint()
+    {
+        elapsedTime += Time.deltaTime;
+        float progress = Mathf.Clamp01(elapsedTime / curveDuration);
+        float easedProgress = EaseInOut(progress);
+        float currentValue = Mathf.Lerp(vanishingPoint, vanishingPointTarget, easedProgress);
+
+        if (progress >= 1f)
+        {
+            SetCurve();
+        }
+        else
+        {
+            Debug.Log(currentValue + "   curvePosible: " + curvePosible + "  distance: " + distance + " progress:" + progress);
+            vanishingPoint = currentValue;
+        }
+    }
+    private float EaseInOut(float t)
+    {
+        // t es el progreso normalizado entre 0 y 1
+        return t < 0.5f
+            ? 2f * t * t // EaseIn
+            : 1f - Mathf.Pow(-2f * t + 2f, 2f) / 2f; // EaseOut
     }
 }

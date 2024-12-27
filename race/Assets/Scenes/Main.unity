@@ -399,12 +399,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pixel_to_add: {fileID: 916278644527953453, guid: 129f2d5ed7b5e4b4b89538f48a9c6e80, type: 3}
   container: {fileID: 1401777804}
-  center: 150
-  curve: 0
+  vanishingPoint: 0
   distance_betweenPoints: 0.2
-  speed: 2
+  speed: 1
   roadWidth: 20
-  aceleration: 50
+  aceleration: 1.02
 --- !u!114 &1394563056
 MonoBehaviour:
   m_ObjectHideFlags: 0
