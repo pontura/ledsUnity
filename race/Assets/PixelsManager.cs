@@ -28,6 +28,12 @@ public class PixelsManager : MonoBehaviour
     [SerializeField] float distance_betweenPoints = 0.3f;
     [SerializeField] float speed = 3;
     [SerializeField] float aceleration = 20;
+
+    [SerializeField] float minCurvePossible = 25;//la minima curva posible dentro del random
+    [SerializeField] float minCurvePossibleMax = 150;//el maximo de la minima curva posible dentro del random
+
+    [SerializeField] Vector2 randomToCurveDuration = new Vector2(5, 10);
+
     List<float> limitsList_right;
     List<float> limitsList_left;
     Vector2 limits;
@@ -181,8 +187,7 @@ public class PixelsManager : MonoBehaviour
         SetColor(limit_right, Color.red, 1);
         SetColor(limit_right-1, Color.red, 0.5f);
 
-        print("road_x " + road_x);
-        float moveByCurve = (road_x - 1) * 10;
+        float moveByCurve = (road_x - 1) * 20;
         Move(moveByCurve);
 
         if (road_x < 1)
@@ -257,16 +262,42 @@ public class PixelsManager : MonoBehaviour
     }
     void CurveRandom() {
         curvePosible = 50 + distance;
-        vanishingPointTarget = vanishingPoint + (int)UnityEngine.Random.Range(-curvePosible, curvePosible);
+        minCurvePossible += 1;
+        if(minCurvePossible>minCurvePossibleMax)
+            minCurvePossible = minCurvePossibleMax;
+        CalculateCurve();
         InitPath();
+    }
+    float newVanishingPointTarget;
+    void CalculateCurve()
+    {
+        float _newVanishingPointTarget = UnityEngine.Random.Range(-curvePosible, curvePosible);
+
+        if (vanishingPoint + _newVanishingPointTarget > totalPixels - 50) _newVanishingPointTarget = totalPixels - 50;
+        else if (vanishingPoint + _newVanishingPointTarget < 50) _newVanishingPointTarget = 50;
+
+        if (Mathf.Abs(newVanishingPointTarget - _newVanishingPointTarget) < minCurvePossible)
+            CalculateCurve();
+        else
+        {
+            newVanishingPointTarget = _newVanishingPointTarget;
+            vanishingPointTarget = vanishingPoint + newVanishingPointTarget;
+        }
     }
     void InitPath()
     {
-        if (vanishingPointTarget > totalPixels - 50) vanishingPointTarget = totalPixels - 50;
-        else if (vanishingPointTarget < 50) vanishingPointTarget = 50;
+        if (randomToCurveDuration.x <= 2)
+            randomToCurveDuration.x = 2;
+        else
+            randomToCurveDuration.x -= 0.05f;
+
+        if (randomToCurveDuration.y <= 4)
+            randomToCurveDuration.y = 4;
+        else
+            randomToCurveDuration.y -= 0.025f;
 
         elapsedTime = 0f;
-        curveDuration = UnityEngine.Random.Range(5, 10);
+        curveDuration = UnityEngine.Random.Range(randomToCurveDuration.x, randomToCurveDuration.x);
     }
     void SetVanishingPoint()
     {
