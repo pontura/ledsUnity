@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static UnityEngine.Rendering.DebugUI;
 
 public class PixelsManager : MonoBehaviour
 {
     [SerializeField] Pixel pixel_to_add;
+    const int FRAMERATE = 60;
 
     List<Pixel> pixels;
     [SerializeField] Transform container;
@@ -43,6 +45,7 @@ public class PixelsManager : MonoBehaviour
 
     void Start()
     {
+        Application.targetFrameRate = FRAMERATE;
         limitsList_right = new List<float>();
         limitsList_left = new List<float>();
         limits = new Vector2 (0, 0);
@@ -102,13 +105,13 @@ public class PixelsManager : MonoBehaviour
     void AddLimitRight(float f)
     {
         limitsList_right.Add(f);
-        if(limitsList_right.Count > 6)
+        if(limitsList_right.Count > 10)
             limitsList_right.RemoveAt(0);
     }
     void AddLimitLeft(float f)
     {
         limitsList_left.Add(f);
-        if (limitsList_left.Count > 6)
+        if (limitsList_left.Count > 10)
             limitsList_left.RemoveAt(0);
     }
     int GetLimit(bool right)
@@ -168,13 +171,13 @@ public class PixelsManager : MonoBehaviour
             else
             {
 
-                if (id >= roadPixelID + (roadPixelID / 2))
+                if (id > roadPixelID + 2)
                     SetRoadPoint(rp, Color.white, alpha, 1);
-                if (id >= roadPixelID + (roadPixelID / 1.75))
+                if (id > roadPixelID + 4)
                     SetRoadPoint(rp, Color.white, alpha, 2);
-                if (id >= roadPixelID + (roadPixelID / 1.5))
+                if (id > roadPixelID + 6)
                     SetRoadPoint(rp, Color.white, alpha, 3);
-                if (id >= roadPixelID + (roadPixelID / 1.3f))
+                if (id > roadPixelID + 8)
                     SetRoadPoint(rp, Color.white, alpha, 4);
             }
 
@@ -268,20 +271,20 @@ public class PixelsManager : MonoBehaviour
         CalculateCurve();
         InitPath();
     }
-    float newVanishingPointTarget;
     void CalculateCurve()
     {
-        float _newVanishingPointTarget = UnityEngine.Random.Range(-curvePosible, curvePosible);
+        float curve = UnityEngine.Random.Range(-curvePosible, curvePosible);
 
-        if (vanishingPoint + _newVanishingPointTarget > totalPixels - 50) _newVanishingPointTarget = totalPixels - 50;
-        else if (vanishingPoint + _newVanishingPointTarget < 50) _newVanishingPointTarget = 50;
-
-        if (Mathf.Abs(newVanishingPointTarget - _newVanishingPointTarget) < minCurvePossible)
+        if ((curve + vanishingPointTarget) > (totalPixels - 50))
+            CalculateCurve();
+        else if ((curve + vanishingPointTarget) < 50)
+            CalculateCurve();
+        else if (Mathf.Abs(curve) < minCurvePossible)
             CalculateCurve();
         else
         {
-            newVanishingPointTarget = _newVanishingPointTarget;
-            vanishingPointTarget = vanishingPoint + newVanishingPointTarget;
+            print(curve + " vanishingPointTarget " + vanishingPointTarget);
+            vanishingPointTarget += curve;
         }
     }
     void InitPath()
@@ -306,7 +309,7 @@ public class PixelsManager : MonoBehaviour
         float easedProgress = EaseInOut(progress);
         float currentValue = Mathf.Lerp(vanishingPoint, vanishingPointTarget, easedProgress);
 
-        if (progress >= 1f)
+        if (progress >= 0.9f)
         {
             SetNextPath();
         }
@@ -323,13 +326,28 @@ public class PixelsManager : MonoBehaviour
             : 1f - Mathf.Pow(-2f * t + 2f, 2f) / 2f; // EaseOut
     }
     float carSpeed = 1;
+    float direction;
     public void Move(float value)
     {
+        this.direction = value;
         carPos -= carSpeed * value * Time.deltaTime;
     }
     void SetCar()
     {
         SetColor((int)carPos-1, Color.yellow, 1);
         SetColor((int)carPos+1, Color.yellow, 1);
+        AddCarPerspective();
     }
+    void AddCarPerspective()
+    {
+        float alpha = Mathf.Abs(direction/100);
+        if (alpha > 1) alpha = 1;
+        if (direction > 15)
+        {
+            SetColor((int)carPos -2, Color.yellow, alpha);
+        } else if (direction < -15)
+        {
+            SetColor((int)carPos + 2, Color.yellow, alpha);
+        }
+    }    
 }

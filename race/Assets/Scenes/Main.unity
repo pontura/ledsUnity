@@ -403,12 +403,12 @@ MonoBehaviour:
   vanishingPointTarget: 0
   vanishingPoint: 0
   roadPixelPercent: 1.35
-  distance_betweenPoints: 0.15
-  speed: 0.5
-  aceleration: 1.02
+  distance_betweenPoints: 0.4
+  speed: 3
+  aceleration: 1.03
   minCurvePossible: 25
   minCurvePossibleMax: 150
-  randomToCurveDuration: {x: 5, y: 10}
+  randomToCurveDuration: {x: 6, y: 10}
 --- !u!114 &1394563056
 MonoBehaviour:
   m_ObjectHideFlags: 0
