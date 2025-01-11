@@ -23,21 +23,26 @@ public class PixelsManager : MonoBehaviour
         public float initial_x;
         public float x;
         public float width;
+        public float car_x;
     }
     [SerializeField]float  roadPixelPercent = 1.6f;
     float timer;
 
     [SerializeField] float distance_betweenPoints = 0.3f;
     [SerializeField] float speed = 3;
-    [SerializeField] float aceleration = 20;
+    [SerializeField] float aceleration = 1.02f;
 
     [SerializeField] float minCurvePossible = 25;//la minima curva posible dentro del random
     [SerializeField] float minCurvePossibleMax = 150;//el maximo de la minima curva posible dentro del random
 
     [SerializeField] Vector2 randomToCurveDuration = new Vector2(5, 10);
 
-    List<float> limitsList_right;
-    List<float> limitsList_left;
+    float limitsList_right;
+    float limitsList_left;
+
+    float limitsList_right_goto;
+    float limitsList_left_goto;
+
     Vector2 limits;
     float distance;
     float carMovement;
@@ -46,8 +51,6 @@ public class PixelsManager : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = FRAMERATE;
-        limitsList_right = new List<float>();
-        limitsList_left = new List<float>();
         limits = new Vector2 (0, 0);
         center = totalPixels / 2;
         carMovement = 0;
@@ -67,7 +70,6 @@ public class PixelsManager : MonoBehaviour
     {
         distance += Time.deltaTime;
         timer += Time.deltaTime;
-
         if (timer > distance_betweenPoints)
             AddRoadPoint();
         UpdateRoadPoints();
@@ -87,7 +89,6 @@ public class PixelsManager : MonoBehaviour
     void UpdateRoadPoints()
     {
         RoadPoint toRemove = null;
-        int a = 0;
         int totalRoadPoints = roadPoints.Count;
         int half = totalPixels / 2;
         foreach (RoadPoint rp in roadPoints)
@@ -95,7 +96,6 @@ public class PixelsManager : MonoBehaviour
             rp.width += speed * Time.deltaTime;
             rp.width *= aceleration;
             rp.x = rp.initial_x + (rp.width * (center - rp.initial_x) / totalPixels);
-            a++;
             if (rp.width > totalPixels)
                 toRemove = rp;
         }
@@ -104,30 +104,26 @@ public class PixelsManager : MonoBehaviour
     }
     void AddLimitRight(float f)
     {
-        limitsList_right.Add(f);
-        if(limitsList_right.Count > 10)
-            limitsList_right.RemoveAt(0);
+        limitsList_right_goto = f;
     }
     void AddLimitLeft(float f)
     {
-        limitsList_left.Add(f);
-        if (limitsList_left.Count > 10)
-            limitsList_left.RemoveAt(0);
+        limitsList_left_goto = f;
     }
     int GetLimit(bool right)
     {
         float total = 0;
         if (right)
         {
-            foreach (float a in limitsList_right)
-                total += a;
-            return (int)Math.Round(total / (float)limitsList_right.Count);
-        }  else  {
-            foreach (float a in limitsList_left)
-                total += a;
-            return (int)Math.Round(total / (float)limitsList_left.Count);
+            limitsList_right = Mathf.Lerp(limitsList_right, limitsList_right_goto, 0.1f);
+            return (int)limitsList_right;
+        }  else
+        {
+            limitsList_left = Mathf.Lerp(limitsList_left, limitsList_left_goto, 0.1f);
+            return (int)limitsList_left;
         }
     }
+    int lastRightKeyframe;
     private void Draw()
     {
         float alpha = 0;
@@ -148,7 +144,6 @@ public class PixelsManager : MonoBehaviour
                 color = Color.red;
                 alpha = 1;
                 road_x = rp.x / center;
-
             }
             else if (id < roadPixelID)
             {
@@ -165,8 +160,14 @@ public class PixelsManager : MonoBehaviour
 
             if (id == roadPixelID)
             {
-                AddLimitRight((int)rp.x + (int)(rp.width / 2));
-                AddLimitLeft((int)rp.x - (int)(rp.width / 2));
+                float _right = (int)rp.x + (int)(rp.width / 2);
+                if (lastRightKeyframe > (int)_right)
+                {
+                    float _left = (int)rp.x - (int)(rp.width / 2);
+                    AddLimitRight(_right);
+                    AddLimitLeft(_left);
+                }
+                lastRightKeyframe = (int)_right;
             }
             else
             {
@@ -194,25 +195,25 @@ public class PixelsManager : MonoBehaviour
         Move(moveByCurve);
 
         if (road_x < 1)
-            SetColor(limit_right + 1, Color.red, 0.75f);
+            SetColor(limit_right + 1, Color.red, 1f);
         if (road_x < 0.9)
             SetColor(limit_right + 2, Color.red, 0.75f); 
         if (road_x < 0.8f)
-            SetColor(limit_right + 3, Color.red, 0.75f);
+            SetColor(limit_right + 3, Color.red, 0.5f);
         if (road_x < 0.6f)
-            SetColor(limit_right + 4, Color.red, 0.75f);
+            SetColor(limit_right + 4, Color.red, 0.3f);
 
         SetColor(limit_left, Color.red, 1);
         SetColor(limit_left + 1, Color.red, 0.5f);
 
         if (road_x > 1f)
-            SetColor(limit_left - 1, Color.red, 0.75f);
+            SetColor(limit_left - 1, Color.red, 1f);
         if (road_x > 1.1)
             SetColor(limit_left - 2, Color.red, 0.75f);
         if (road_x > 1.2f)
-            SetColor(limit_left - 3, Color.red, 0.75f);
+            SetColor(limit_left - 3, Color.red, 0.5f);
         if (road_x > 1.4f)
-            SetColor(limit_left - 4, Color.red, 0.75f);
+            SetColor(limit_left - 4, Color.red, 0.3f);
     }
     void SetColor(int pixel, Color color, float alpha)
     {
@@ -300,7 +301,7 @@ public class PixelsManager : MonoBehaviour
             randomToCurveDuration.y -= 0.025f;
 
         elapsedTime = 0f;
-        curveDuration = UnityEngine.Random.Range(randomToCurveDuration.x, randomToCurveDuration.x);
+        curveDuration = UnityEngine.Random.Range(randomToCurveDuration.x, randomToCurveDuration.x) / aceleration;
     }
     void SetVanishingPoint()
     {
