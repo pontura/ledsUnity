@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Rendering;
 using static UnityEngine.Rendering.DebugUI;
@@ -14,28 +15,7 @@ public class PixelsManager : MonoBehaviour
     [SerializeField] Transform container;
     int totalPixels = 300;
     int center;
-    [SerializeField] float vanishingPointTarget;
-    [SerializeField] float vanishingPoint;
     List<RoadPoint> roadPoints;
-    [Serializable]
-    class RoadPoint
-    {
-        public float initial_x;
-        public float x;
-        public float width;
-        public float car_x;
-    }
-    [SerializeField]float  roadPixelPercent = 1.6f;
-    float timer;
-
-    [SerializeField] float distance_betweenPoints = 0.3f;
-    [SerializeField] float speed = 3;
-    [SerializeField] float aceleration = 1.02f;
-
-    [SerializeField] float minCurvePossible = 25;//la minima curva posible dentro del random
-    [SerializeField] float minCurvePossibleMax = 150;//el maximo de la minima curva posible dentro del random
-
-    [SerializeField] Vector2 randomToCurveDuration = new Vector2(5, 10);
 
     float limitsList_right;
     float limitsList_left;
@@ -47,6 +27,61 @@ public class PixelsManager : MonoBehaviour
     float distance;
     float carMovement;
     float carPos;
+
+
+    [SerializeField] float vanishingPointTarget;
+    [SerializeField] float vanishingPoint;
+    [SerializeField] float roadPixelWidth = 60;
+    float timer;
+
+    [SerializeField] float distance_betweenPoints = 0.3f;
+    [SerializeField] float speed = 3;
+    [SerializeField] float aceleration = 1.02f;
+
+    [SerializeField] float minCurvePossible = 25;//la minima curva posible dentro del random
+    [SerializeField] float minCurvePossibleMax = 150;//el maximo de la minima curva posible dentro del random
+
+    [SerializeField] Vector2 randomToCurveDuration = new Vector2(5, 10);
+
+
+    [Serializable]
+    class RoadPoint
+    {
+        float roadPixelWidth;
+        float alphaValue = 0.25f;
+        public float initial_x;
+        public float x;
+        public float width;
+        public float car_x;
+
+        public void UpdateCar()
+        {
+            if (alphaValue == 0.25f)
+                alphaValue = 0.75f;
+            else if (alphaValue == 0.75f)
+                alphaValue = 0.25f;
+            if (width > roadPixelWidth)
+                SetOff();
+        }
+        public float Alpha()
+        {
+            if (width > roadPixelWidth - 20)
+                return 1;
+            else if (width > roadPixelWidth - 40)
+                return 0.7f;
+            else
+                return alphaValue;
+        }
+        public void AddCar(float roadPixelWidth)
+        {
+            this.roadPixelWidth = roadPixelWidth;
+            car_x = UnityEngine.Random.Range(0.1f, 0.9f);
+        }
+        public void SetOff()
+        {
+            car_x = 0;
+        }
+    }
 
     void Start()
     {
@@ -65,9 +100,13 @@ public class PixelsManager : MonoBehaviour
         }
         SetNextPath();
     }
-
+    void AddCar()
+    {
+        roadPoints[roadPoints.Count - 1].AddCar(roadPixelWidth);
+    }
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space)) AddCar();
         distance += Time.deltaTime;
         timer += Time.deltaTime;
         if (timer > distance_betweenPoints)
@@ -134,22 +173,23 @@ public class PixelsManager : MonoBehaviour
             SetColor(a, Color.black, 0);
         }
         int totalRoadPoints = roadPoints.Count;
-        int roadPixelID = (int)Mathf.Round((float)roadPoints.Count / roadPixelPercent);
+        int roadPixelID = 0;
         float road_x = 0;
         int id = totalRoadPoints;
         foreach (RoadPoint rp in roadPoints)
         {
-            if (id == roadPixelID)
+            if (roadPixelID == 0 && rp.width < roadPixelWidth)
             {
+                roadPixelID = id;
                 color = Color.red;
                 alpha = 1;
                 road_x = rp.x / center;
             }
             else if (id < roadPixelID)
             {
-                color = Color.blue;
-                alpha = 1f;
-                SetRoadPoint(rp, color, alpha);
+                color = Color.blue; 
+                alpha = (rp.width+roadPixelWidth) / totalPixels;
+                SetRoadPoint(rp, color, alpha, 0, 0);               
             }
             else
             {
@@ -157,7 +197,20 @@ public class PixelsManager : MonoBehaviour
                 alpha = rp.width/totalPixels;
                 SetRoadPoint(rp, color, alpha);
             }
-
+            if (rp.car_x != 0)
+            {
+                rp.UpdateCar();
+                int pixel = (int)Mathf.Lerp(rp.x - (rp.width / 2), rp.x + (rp.width / 2), rp.car_x);
+                float car_alpha = rp.Alpha();
+                Color car_color = Color.red;
+                if(rp.width>roadPixelWidth-40)
+                {
+                    //Two_lights
+                    SetColor(pixel + 1, car_color, car_alpha);
+                    SetColor(pixel - 1, car_color, car_alpha);
+                } else
+                    SetColor(pixel, car_color, car_alpha);
+            }
             if (id == roadPixelID)
             {
                 float _right = (int)rp.x + (int)(rp.width / 2);
@@ -184,7 +237,7 @@ public class PixelsManager : MonoBehaviour
 
             id--;
         }
-        SetColor((int)vanishingPoint, Color.green, 1);
+        SetColor((int)vanishingPoint, Color.blue, 1);
         int limit_right = GetLimit(true);
         int limit_left = GetLimit(false);
 
@@ -222,11 +275,19 @@ public class PixelsManager : MonoBehaviour
 
         pixels[pixel].SetData(color, alpha);
     }
-    void SetRoadPoint(RoadPoint rp, Color color, float alpha, int offset = 0)
+    void SetRoadPoint(RoadPoint rp, Color color, float alpha, int offset = 0, int priority = 1)
     {
         int pixel_right = (int)rp.x + (int)(rp.width / 2);
         int pixel_left = (int)rp.x - (int)(rp.width / 2);
 
+        if(priority == 0)
+        {
+            if (pixels[pixel_right + offset].IsAvailable())
+                SetColor(pixel_right + offset, color, alpha);
+            if (pixels[pixel_left - offset].IsAvailable())
+                SetColor(pixel_left - offset, color, alpha);
+            return;
+        }
         SetColor(pixel_right + offset, color, alpha);
         SetColor(pixel_left - offset, color, alpha);
     }
