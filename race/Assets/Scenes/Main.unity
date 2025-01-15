@@ -400,12 +400,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pixel_to_add: {fileID: 916278644527953453, guid: 129f2d5ed7b5e4b4b89538f48a9c6e80, type: 3}
   container: {fileID: 1401777804}
+  carsRandom: {x: 1, y: 5}
   vanishingPointTarget: 0
   vanishingPoint: 0
-  roadPixelWidth: 60
-  distance_betweenPoints: 0.4
-  speed: 7
-  aceleration: 1.01
+  roadPixelWidth: 200
+  roadPixelWidthDecrease: 1
+  minRoadPixelWidth: 60
+  distance_betweenPoints: 0.3
+  speed: 10
+  speedDrecrease: {x: 1, y: 5}
+  aceleration: 1.02
   minCurvePossible: 25
   minCurvePossibleMax: 150
   randomToCurveDuration: {x: 12, y: 20}
