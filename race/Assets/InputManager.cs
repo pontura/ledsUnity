@@ -8,6 +8,14 @@ public class InputManager : MonoBehaviour
     float zeroValue;
     float lastMousePos;
     bool started;
+
+    public types type;
+    public enum types
+    {
+        keyboard,
+        joystick
+    }
+
     void Start()
     {
         zeroValue = Input.mousePosition.x;
@@ -16,7 +24,12 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (type == types.keyboard) UpdateKeyboard();
+        else UpdateJoystick();
+    }
+    void UpdateKeyboard()
+    {
+        if (Input.GetMouseButtonDown(0))
         {
             started = true;
             value = 0;
@@ -29,5 +42,10 @@ public class InputManager : MonoBehaviour
 
         lastMousePos = Input.mousePosition.x;
         value = zeroValue - Input.mousePosition.x;
+    }
+    void UpdateJoystick()
+    {
+        value = Input.GetAxis("Horizontal")*100*-1;
+        pixelsManager.Move(value);
     }
 }

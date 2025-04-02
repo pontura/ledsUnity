@@ -404,12 +404,14 @@ MonoBehaviour:
   vanishingPointTarget: 0
   vanishingPoint: 0
   roadPixelWidth: 200
+  roadPixelWidthLimits: {x: 200, y: 60}
   roadPixelWidthDecrease: 1
-  minRoadPixelWidth: 60
-  distance_betweenPoints: 0.3
+  distance_betweenPoints: 0.2
   speed: 10
-  speedDrecrease: {x: 1, y: 5}
   aceleration: 1.02
+  speedInrease: 1
+  speedLimits: {x: 8, y: 20}
+  acelerationLimits: {x: 1.02, y: 1.04}
   minCurvePossible: 25
   minCurvePossibleMax: 150
   randomToCurveDuration: {x: 12, y: 20}
@@ -510,6 +512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   value: 0
+  type: 1
 --- !u!1 &1401777803
 GameObject:
   m_ObjectHideFlags: 0
@@ -544,7 +547,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 10}
+  m_SizeDelta: {x: 0, y: 6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1401777805
 MonoBehaviour:

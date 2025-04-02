@@ -1,26 +1,21 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Runtime.InteropServices.WindowsRuntime;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.Rendering;
-using static UnityEngine.Rendering.DebugUI;
 
 public class PixelsManager : MonoBehaviour
 {
     [SerializeField] Pixel pixel_to_add;
     const int FRAMERATE = 60;
 
-    int state = 0; //0 = playing 1=die;
+    int state = -1; //0 = playing 1=die;
 
     List<Pixel> pixels;
     [SerializeField] Transform container;
 
     //cars
     float initCarsIn = 5; // seconds
-    [SerializeField] Vector2 carsRandom = new Vector2(1,5); 
+    [SerializeField] Vector2 carsRandomLimits = new Vector2(1,5);
+    Vector2 carsRandom = new Vector2(0, 0);
     Vector2 minCarsRandom = new Vector2(0.2f, 0.75f);
     float carsRandomDisminutionSubstraction = 0.05f; //cuanto resta por iteracion
 
@@ -40,18 +35,25 @@ public class PixelsManager : MonoBehaviour
     float carMovement;
     float carPos;
 
+    int limit_right;
+    int limit_left;
+
 
     [SerializeField] float vanishingPointTarget;
     [SerializeField] float vanishingPoint;
-    [SerializeField] float roadPixelWidth = 60;
+    [SerializeField] float roadPixelWidth;
+    [SerializeField] Vector2 roadPixelWidthLimits = new Vector2(200, 60);
     [SerializeField] float roadPixelWidthDecrease = 1;
-    [SerializeField] float minRoadPixelWidth = 60;
     float timer;
 
     [SerializeField] float distance_betweenPoints = 0.3f;
-    [SerializeField] float speed = 3;
-    [SerializeField] Vector2 speedDrecrease = new Vector2(1, 5);
-    [SerializeField] float aceleration = 1.02f;
+
+    [SerializeField] float speed;
+    [SerializeField] float aceleration;
+
+    [SerializeField] float speedInrease = 1;
+    [SerializeField] Vector2 speedLimits = new Vector2(10, 20);
+    [SerializeField] Vector2 acelerationLimits = new Vector2(1.02f, 1.04f);
 
     [SerializeField] float minCurvePossible = 25;//la minima curva posible dentro del random
     [SerializeField] float minCurvePossibleMax = 150;//el maximo de la minima curva posible dentro del random
@@ -103,19 +105,34 @@ public class PixelsManager : MonoBehaviour
 
     void Start()
     {
-        Application.targetFrameRate = FRAMERATE;
-        limits = new Vector2 (0, 0);
-        center = totalPixels / 2;
-        carMovement = 0;
-        carPos = center;
-        pixels = new List<Pixel>();
         roadPoints = new List<RoadPoint>();
-        vanishingPoint = totalPixels / 2;
+        Application.targetFrameRate = FRAMERATE;
+        center = totalPixels / 2;
+
+        pixels = new List<Pixel>();
         for (int i = 0; i < totalPixels; i++)
         {
             Pixel p = Instantiate(pixel_to_add, container);
             pixels.Add(p);
         }
+        Restart();
+    }
+    void Restart()
+    {
+        carsRandom = carsRandomLimits;
+        state = 0;
+        roadPixelWidth = roadPixelWidthLimits.x;
+        timer = 0;
+        distance = 0;
+        limits = new Vector2(0, totalPixels);
+        speed = speedLimits.x;
+        aceleration = acelerationLimits.x; 
+        carPos = center;
+        carMovement = 0;
+        roadPoints.Clear();
+        vanishingPoint = center;
+
+        CancelInvoke();
         SetNextPath();
         Invoke("AddCar", initCarsIn);
     }
@@ -136,11 +153,16 @@ public class PixelsManager : MonoBehaviour
         UpdateRoadPoints();
         Draw();
         SetVanishingPoint();
-        SetCar();
-        if (roadPixelWidth <= minRoadPixelWidth)
-            roadPixelWidth = minRoadPixelWidth;
+        if (roadPixelWidth <= roadPixelWidthLimits.y)
+            roadPixelWidth = roadPixelWidthLimits.y;
         else
             roadPixelWidth -= roadPixelWidthDecrease * Time.deltaTime;
+        if(speed>=speedLimits.y)
+            speed = speedLimits.y;
+        speed += (speedInrease * Time.deltaTime)/10;
+        if (aceleration >= acelerationLimits.y)
+            aceleration = acelerationLimits.y;
+        aceleration += (speedInrease * Time.deltaTime) / 1000;
     }
     void AddCar()
     {
@@ -235,7 +257,7 @@ public class PixelsManager : MonoBehaviour
             else if (id < roadPixelID)
             {
                 color = Color.blue; 
-                alpha = (rp.width / roadPixelWidth);
+                alpha = 0.15f+(rp.width / roadPixelWidth);
                 SetRoadPoint(rp, color, alpha, 0, 0);               
             }
             else
@@ -262,18 +284,35 @@ public class PixelsManager : MonoBehaviour
                 int pixel = (int)Mathf.Lerp(rp.x - (rp.width / 2), rp.x + (rp.width / 2), rp.car_x);
                 float car_alpha = rp.Alpha();
                 Color car_color = Color.red;
-                if (rp.width > roadPixelWidth - 60)
+                Color redDark = new Color(0.25f, 0, 0);
+                if (rp.width > roadPixelWidth - 40)
+                {
+                    //Two_lights
+                    SetColor(pixel + 5, car_color, 1);
+                    SetColor(pixel + 4, car_color, 1);
+                    SetColor(pixel + 3, car_color, 1);
+                    SetColor(pixel + 2, redDark, 1);
+                    SetColor(pixel + 1, redDark, 1);
+                    SetColor(pixel,     redDark, 1);
+                    SetColor(pixel - 1, redDark, 1);
+                    SetColor(pixel - 2, redDark, 1);
+                    SetColor(pixel - 3, car_color, 1);
+                    SetColor(pixel - 4, car_color, 1);
+                    SetColor(pixel - 5, car_color, 1);
+                }
+                else
+               if (rp.width > roadPixelWidth - 80)
                 {
                     //Two_lights
                     SetColor(pixel + 3, car_color, car_alpha);
                     SetColor(pixel + 2, car_color, car_alpha);
-                    SetColor(pixel + 1, Color.black, 1);
-                    SetColor(pixel    , Color.black, 1);
-                    SetColor(pixel - 1, Color.black, 1);
+                    SetColor(pixel + 1, redDark, 1);
+                    SetColor(pixel    , redDark, 1);
+                    SetColor(pixel - 1, redDark, 1);
                     SetColor(pixel - 2, car_color, car_alpha);
                     SetColor(pixel - 3, car_color, car_alpha);
                 } else
-                if (rp.width>roadPixelWidth-110)
+                if (rp.width>roadPixelWidth -130)
                 {
                     //Two_lights
                     SetColor(pixel + 1, car_color, car_alpha);
@@ -281,12 +320,12 @@ public class PixelsManager : MonoBehaviour
                 } else
                     SetColor(pixel, car_color, car_alpha);
 
+              
                 if (carOnPosition)
                 {
                     rp.SetOff();
                     carPassed = 1;
-                    print("carPos " + carPos + "    pixel " + pixel);
-                    if (carPos >= pixel - 3 && carPos <= pixel + 3)
+                    if (carPos >= pixel - 5 && carPos <= pixel + 5)
                         Crash();
                 }
             }
@@ -317,35 +356,45 @@ public class PixelsManager : MonoBehaviour
             id--;
         }
         SetColor((int)vanishingPoint, Color.blue, 1);
-        int limit_right = GetLimit(true);
-        int limit_left = GetLimit(false);
+        limit_right = GetLimit(true);
+        limit_left = GetLimit(false);
 
-        SetColor(limit_right, Color.red, 1);
-        SetColor(limit_right-1, Color.red, 0.25f);
+        SetColor(limit_right, Color.white, 1);
+        SetColor(limit_right-1, Color.white, 0.25f);
 
-        float moveByCurve = (road_x - 1) * 20;
+        float moveByCurve = (road_x - 1) * 200;
         Move(moveByCurve);
 
-        if (road_x < 1)
-            SetColor(limit_right + 1, Color.red, 1f);
-        if (road_x < 0.8)
-            SetColor(limit_right + 2, Color.red, 0.75f); 
-        if (road_x < 0.6f)
-            SetColor(limit_right + 3, Color.red, 0.5f);
-        if (road_x < 0.4f)
-            SetColor(limit_right + 4, Color.red, 0.3f);
+        SetLimits(road_x);
 
-        SetColor(limit_left, Color.red, 1);
-        SetColor(limit_left + 1, Color.red, 0.25f);
+        if (carPos >= limit_right || carPos <= limit_left)
+            Crash();
+
+        SetCar();
+    }
+    void SetLimits(float road_x)
+    {
+        Color color = Color.white;
+        if (road_x < 1)
+            SetColor(limit_right + 1, color, 1f);
+        if (road_x < 0.8)
+            SetColor(limit_right + 2, color, 0.75f);
+        if (road_x < 0.6f)
+            SetColor(limit_right + 3, color, 0.5f);
+        if (road_x < 0.4f)
+            SetColor(limit_right + 4, color, 0.3f);
+
+        SetColor(limit_left, color, 1);
+        SetColor(limit_left + 1, color, 0.25f);
 
         if (road_x > 1f)
-            SetColor(limit_left - 1, Color.red, 1f);
+            SetColor(limit_left - 1, color, 1f);
         if (road_x > 1.2)
-            SetColor(limit_left - 2, Color.red, 0.75f);
+            SetColor(limit_left - 2, color, 0.75f);
         if (road_x > 1.4f)
-            SetColor(limit_left - 3, Color.red, 0.5f);
+            SetColor(limit_left - 3, color, 0.5f);
         if (road_x > 1.6f)
-            SetColor(limit_left - 4, Color.red, 0.3f);
+            SetColor(limit_left - 4, color, 0.3f);
     }
     void SetColor(int pixel, Color color, float alpha)
     {
@@ -469,6 +518,8 @@ public class PixelsManager : MonoBehaviour
     float direction;
     public void Move(float value)
     {
+        if (distance < 2) value = 0;
+        if (state == 1) value = 0;
         this.direction = value;
         carPos -= carSpeed * value * Time.deltaTime;
     }
@@ -477,26 +528,27 @@ public class PixelsManager : MonoBehaviour
         // SetColor((int)carPos-1, Color.yellow, 1);
         // SetColor((int)carPos+1, Color.yellow, 1);
         SetColor((int)carPos, Color.yellow, 1);
-        AddCarPerspective();
+      //  AddCarPerspective();
     }
-    void AddCarPerspective()
-    {
-        float alpha = Mathf.Abs((direction*5)/100);
-        if (alpha > 1) alpha = 1;
-        if (direction > 5)
-        {
-            SetColor((int)carPos -1, Color.yellow, alpha);
-        } else if (direction < -5)
-        {
-            SetColor((int)carPos + 1, Color.yellow, alpha);
-        }
-    }
+    //void AddCarPerspective()
+    //{
+    //    float alpha = Mathf.Abs((direction*5)/100);
+    //    if (alpha > 1) alpha = 1;
+    //    if (direction > 5)
+    //    {
+    //        SetColor((int)carPos -1, Color.yellow, alpha);
+    //    } else if (direction < -5)
+    //    {
+    //        SetColor((int)carPos + 1, Color.yellow, alpha);
+    //    }
+    //}
 
     //CRASH:
     float crashTimer = 0;
     int crashLoops;
     void Crash()
     {
+        if (distance < 4) return;
         if (state == 1) return;
         crashTimer = 0;
         state = 1;
@@ -507,16 +559,16 @@ public class PixelsManager : MonoBehaviour
         crashTimer += Time.deltaTime;
         if (crashLoops > 5)
         {
-            state = 0;
+            Restart();
         }
         else
         {
-            if (crashTimer > 0.5f)
+            if (crashTimer > 0.3f)
             {
                 crashLoops++;
                 crashTimer = 0;
             }
-            if (crashTimer > 0.25f)
+            if (crashTimer > 0.15f)
                 Draw();
             else
                 SetAllPixelsTo(Color.red, 1);
