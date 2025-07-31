@@ -41,7 +41,7 @@ def random_color():
 
 # --- Uso ---
 
-pixels = LightSignals(pin_num=22)
+pixels = LightSignals(pin_num=1)
 
 while True:
     color1 = random_color()

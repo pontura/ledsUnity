@@ -62,7 +62,6 @@ class BoublesGame:
             self.intro.OnUpdate()
         elif self.state == 2:            
             self.OnUpdate()
-
         self.myLeds.Send()
 #         self.DrawDebug()
 #         fps.Update()

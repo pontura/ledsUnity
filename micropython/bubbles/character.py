@@ -34,8 +34,9 @@ class Character:
         else:
             c2= 0
             c1= 1
-        self.game.SetLed(c1, self.color)
-        self.game.SetLed(c2, self.color2)
+        self.SetCharacterColor(1, self.color)
+        #self.game.SetLed(c1, self.color)
+        #self.game.SetLed(c2, self.color2)
         
     def Hide(self, numLeds):
         if self.characterID == 1:
@@ -44,5 +45,6 @@ class Character:
         else:
             c2= 0
             c1= 1
-        self.game.SetLed(c1, 0)
-        self.game.SetLed(c2, 0)
+        self.SetCharacterColor(2, 0)
+        #self.game.SetLed(c1, 0)
+        #self.game.SetLed(c2, 0)

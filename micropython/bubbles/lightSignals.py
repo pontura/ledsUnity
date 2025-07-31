@@ -4,7 +4,7 @@ import time
 import random
 
 class LightSignals:
-    def __init__(self, pin_num=0, num_pixels=100):
+    def __init__(self, pin_num=1, num_pixels=100):
         self.num_pixels = num_pixels
         self.pin = machine.Pin(pin_num)
         self.strip = neopixel.NeoPixel(self.pin, self.num_pixels)
@@ -41,7 +41,7 @@ def random_color():
 
 # --- Uso ---
 
-pixels = LightSignals(pin_num=22)
+pixels = LightSignals(pin_num=1)
 
 while True:
     color1 = random_color()
