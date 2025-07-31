@@ -1,12 +1,12 @@
 import machine
 import time
-import character, shoots, enemies, audio
+import character, shoots, enemies, audio, lightSignals
 # import FPS
 import leds
 import intro
             
 class BoublesGame:
-    numLeds = 300
+    numLeds = 288
 #     numLeds = 150
     chararter_width = 2
     myLeds = leds.Leds()
