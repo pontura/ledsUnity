@@ -8,8 +8,10 @@ import intro
 class BoublesGame:
     numLeds = 288
 #     numLeds = 150
-    chararter_width = 2
+    chararter_width = 9
     myLeds = leds.Leds()
+    lightSignals = lightSignals.LightSignals(1, 18)
+    
     myLeds.Init(numLeds)
     audio = audio.Audio()
     intro = intro.Intro()
@@ -37,7 +39,10 @@ class BoublesGame:
         self.Init()
         self.colors = [1,2,3,4,5,6]
         self.enemies = enemies.Enemies()
-        self.enemies.Init(self, self.chararter_width, self.numLeds)
+        
+        #self.enemies.Init(self, self.chararter_width, self.numLeds)
+        self.enemies.Init(self, 0, self.numLeds)
+        
         self.intro.Init(self, self.numLeds)
         self.shoots = shoots.Shoots()
         self.shoots.Init(self, self.numLeds)
@@ -46,13 +51,17 @@ class BoublesGame:
         ch = character.Character()
         ch.Init(self, 1, self.numLeds - 1, self.chararter_width, self.totalColors)
         self.characters.append(ch)
+        
         ch = character.Character()
         ch.Init(self, 2, 0, self.chararter_width, self.totalColors)
         self.characters.append(ch)
 
-        self.from_range = self.chararter_width
-        self.to_range = self.numLeds - self.chararter_width
-
+        #self.from_range = self.chararter_width
+        #self.to_range = self.numLeds - self.chararter_width        
+        self.from_range = 0
+        self.to_range = self.numLeds
+        
+        
         self.ledsData = [0] * self.numLeds
 
         self.Restart()
@@ -62,6 +71,7 @@ class BoublesGame:
             self.intro.OnUpdate()
         elif self.state == 2:            
             self.OnUpdate()
+            
         self.myLeds.Send()
 #         self.DrawDebug()
 #         fps.Update()
@@ -84,7 +94,6 @@ class BoublesGame:
 
     def ChangeColors(self, characterID, playSound : bool ):
         if self.state == 1:
-            print ("ChangeColors", self.state)
             self.GotoState(2)
             return
         if self.enemies.state == 3:
@@ -131,8 +140,10 @@ class BoublesGame:
         
         
         if self.enemies.state == 0:
+            
+            self.lightSignals.OnUpdate()            
             self.enemies.CleanLeds(self.centerLedID, self.from_range, self.to_range, self.ch, self.characters[self.ch-1].color)
-       
+            
             if self.timer > self.delayToAdd:
                 if self.delayToAdd < self.minDelayToAdd:
                     self.delayToAdd = self.minDelayToAdd
@@ -151,10 +162,11 @@ class BoublesGame:
                     self.chTick = 1                    
                     self.audio.Tick(self.chTick)
                 
+                #self.characters[1].Draw(self.numLeds)
+                #self.characters[0].Draw(self.numLeds)
+                
                 self.enemies.UpdateDraw(self.chTick, self.centerLedID)
                 
-            self.characters[0].Draw(self.numLeds)
-            self.characters[1].Draw(self.numLeds)
             
         elif self.enemies.state == 3: #3: dead!
             #if self.timer>0.5:
@@ -196,6 +208,13 @@ class BoublesGame:
     def LoopNote(self, note : float, ch : int):
         self.audio.LoopNote(note, ch)
     
+    #@micropython.viper 
+    def SetCharacterColor(self, l :int , c :int):
+        color = self.myLeds.GetColorReal(c)
+        if l==1:
+            self.lightSignals.SetCharacter1(color)
+        else:
+            self.lightSignals.SetCharacter2(color)
         
     @micropython.viper 
     def SetLed(self, l :int , c :int):        
@@ -288,6 +307,7 @@ while True:
         
     game.Update()
 #     time.sleep(0.02)
+
 
 
 

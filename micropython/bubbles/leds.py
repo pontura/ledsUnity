@@ -1,13 +1,28 @@
 from machine import Pin
+import rp2
 import array
-import neopixel
 
-class Leds:   
+class Leds:
     
     PIN_NUM = 22
-    NUM_PIXELS = 288
-    
-    np = neopixel.NeoPixel(machine.Pin(PIN_NUM), NUM_PIXELS)
+    NUM_LEDS = 300
+
+    @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=24)
+    def ws2812():
+        T1 = 2
+        T2 = 5
+        T3 = 3
+        wrap_target()
+        label("bitloop")
+        out(x, 1)               .side(0)    [T3 - 1]
+        jmp(not_x, "do_zero")   .side(1)    [T1 - 1]
+        jmp("bitloop")          .side(1)    [T2 - 1]
+        label("do_zero")
+        nop()                   .side(0)    [T2 - 1]
+        wrap()
+
+    sm = rp2.StateMachine(0, ws2812, freq=8_000_000, sideset_base=Pin(PIN_NUM))
+    sm.active(1)
     
     dimmer_ar = []
     
@@ -71,13 +86,9 @@ class Leds:
         for a in range(self.NUM_LEDS):
             self.dimmer_ar[a] = self.bgColor
             
-#    @micropython.viper 
+    @micropython.viper 
     def Send(self):
-        print("send")
-        for i in range(self.NUM_LEDS):
-            np[i] = self.dimmer_ar[i]  # Rojo
-        np.write()
-#         self.sm.put(self.dimmer_ar, 8)
+        self.sm.put(self.dimmer_ar, 8)
 #         s = "".join(str(self.GetStr(n)) for n in self.dimmer_ar)
 #         print(s)
          
@@ -100,11 +111,11 @@ class Leds:
             return "6"
         return "x"
       
-   # @micropython.viper 
+    @micropython.viper 
     def SetLed(self, colorID : int, id : int):
         self.dimmer_ar[id] = self.GetColor(colorID)
     
-   # @micropython.viper 
+    @micropython.viper 
     def SetLed2(self, colorID : int, id : int):
         self.dimmer_ar[id] = self.GetColor2(colorID)
         
@@ -112,7 +123,28 @@ class Leds:
         c = self.GetColor(colorID)                 
         self.SetPixelBrighteness(c, id, a)
         
-   # @micropython.viper 
+    @micropython.viper 
+    def GetColorReal(self, colorID : int):
+        c = ""
+        if colorID == 10:
+            c = self.WHITE
+        elif colorID == 0:
+            c = self.BLACK
+        elif colorID == 1:
+            c = self.RED
+        elif colorID == 2:
+            c = self.GREEN
+        elif colorID == 3:
+            c = self.BLUE
+        elif colorID == 4:
+            c = self.YELLOW
+        elif colorID == 5:
+            c = self.CYAN
+        elif colorID == 6:
+            c = self.MAGENTA
+        return c
+    
+    @micropython.viper 
     def GetColor(self, colorID : int):
         c = ""
         if colorID == 10:
@@ -133,7 +165,7 @@ class Leds:
             c = self.magenta
         return c
     
- #   @micropython.viper 
+    @micropython.viper 
     def GetColor2(self, colorID : int):
         c = ""
         if colorID == 10:
