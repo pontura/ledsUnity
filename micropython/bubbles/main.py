@@ -10,7 +10,7 @@ class BoublesGame:
 #     numLeds = 150
     chararter_width = 9
     myLeds = leds.Leds()
-    lightSignals = lightSignals.LightSignals(1, 18)
+    lightSignals = lightSignals.LightSignals(1)
     
     myLeds.Init(numLeds)
     audio = audio.Audio()

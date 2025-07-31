@@ -27,14 +27,14 @@ class Character:
         if self.color2 > self.game.totalColors:
             self.color2 = 1
 
-    def Draw(self, numLeds):
-        if self.characterID == 1:
-            c1 = numLeds - 2
-            c2 = numLeds   -1       
-        else:
-            c2= 0
-            c1= 1
-        self.SetCharacterColor(1, self.color)
+    #def Draw(self, numLeds):
+        #if self.characterID == 1:
+            #c1 = numLeds - 2
+            #c2 = numLeds   -1       
+       # else:
+           # c2= 0
+           # c1= 1
+        self.game.SetCharacterColor(self.characterID, self.color)
         #self.game.SetLed(c1, self.color)
         #self.game.SetLed(c2, self.color2)
         
@@ -45,6 +45,6 @@ class Character:
         else:
             c2= 0
             c1= 1
-        self.SetCharacterColor(2, 0)
+        self.game.SetCharacterColor(self.characterID, 0)
         #self.game.SetLed(c1, 0)
         #self.game.SetLed(c2, 0)
