@@ -13,6 +13,8 @@ class Intro:
     flashing = []
 
     num_flashes = 10
+    
+    timer = 0
 
     
         
@@ -26,20 +28,24 @@ class Intro:
             self.flashing.append([self.pix, random.randint(1, self.max_colors), flash_len, 0, 1])
         
     def OnUpdate(self):
+        self.timer = self.timer + 1
+        if self.timer>2:
+            self.timer = 0
+            self.game.Fade(4)
+        else:
+            for i in range(self.num_flashes):
 
-        for i in range(self.num_flashes):
+                pix = self.flashing[i][0]
+                brightness = (self.flashing[i][3]/self.flashing[i][2])
+                self.game.SetLedAlpha(pix, self.flashing[i][1],brightness )
 
-            pix = self.flashing[i][0]
-            brightness = (self.flashing[i][3]/self.flashing[i][2])
-            self.game.SetLedAlpha(pix, self.flashing[i][1],brightness )
-
-            if self.flashing[i][2] == self.flashing[i][3]:
-                self.flashing[i][4] = -1
-            if self.flashing[i][3] == 0 and self.flashing[i][4] == -1:
-                pix = random.randint(0, self.numpix - 1)
-                col = random.randint(1, self.max_colors)
-                flash_len = random.randint(self.min_len, self.max_len)
-                self.flashing[i] = [pix, col, flash_len, 0, 1]
-            self.flashing[i][3] = self.flashing[i][3] + self.flashing[i][4]
-            time.sleep(0.005)
+                if self.flashing[i][2] == self.flashing[i][3]:
+                    self.flashing[i][4] = -1
+                if self.flashing[i][3] == 0 and self.flashing[i][4] == -1:
+                    pix = random.randint(0, self.numpix - 1)
+                    col = random.randint(1, self.max_colors)
+                    flash_len = random.randint(self.min_len, self.max_len)
+                    self.flashing[i] = [pix, col, flash_len, 0, 1]
+                self.flashing[i][3] = self.flashing[i][3] + self.flashing[i][4]
+                time.sleep(0.005)
 

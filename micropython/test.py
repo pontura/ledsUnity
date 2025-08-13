@@ -3,7 +3,7 @@ import neopixel
 import time
 
 # Configuración
-NUM_PIXELS = 20
+NUM_PIXELS = 1
 PIN = 0  # GPIO0
 
 # Inicializar la tira de LEDs
@@ -14,7 +14,7 @@ for i in range(10):
     np[i] = (0, 255, 0)  # (R, G, B)
 
 # Encender los últimos 10 en rojo
-for i in range(10, 20):
+for i in range(10, 23):
     np[i] = (255, 0, 0)
 
 # Mostrar el cambio

@@ -3,7 +3,8 @@ import time
 import character, shoots, enemies, audio, lightSignals
 # import FPS
 import leds
-import intro, gameInit
+import intro, gameInit, fade
+import automaticPlay
             
 class BoublesGame:
     numLeds = 288
@@ -15,12 +16,14 @@ class BoublesGame:
     myLeds.Init(numLeds)
     audio = audio.Audio()
     intro = intro.Intro()
+    automaticPlay = automaticPlay.AutomaticPlay()
     gameInit = gameInit.GameInit()
+    fade = fade.Fade()
     ch = 1
     wonCh = 0
     deltaTime = 0.03
     centerColor = 0
-    state = 1 #1=intro 2=game
+    state = 5 #1=intro 2=game 5=fade
     
     def Init(self):
         self.delayToAdd = 0.4
@@ -46,6 +49,8 @@ class BoublesGame:
         
         self.intro.Init(self, self.numLeds)
         self.gameInit.Init(self, self.numLeds)
+        self.automaticPlay.Init(self)
+        self.fade.Init(self, self.numLeds)
         
         self.shoots = shoots.Shoots()
         self.shoots.Init(self, self.numLeds)
@@ -68,27 +73,46 @@ class BoublesGame:
         self.ledsData = [0] * self.numLeds
 
         self.Restart()
-
+        self.Fade(1, 10)
+        
+    def Fade(self, gotoNext, color):
+        self.GotoState(5)
+        self.fade.InitFade(gotoNext, color)
+        
     def Update(self):
         self.lightSignals.OnUpdateLate() 
-        if self.state == 1:
+        if self.state == 1: #intro
             self.intro.OnUpdate()
-        elif self.state == 2:            
+        elif self.state == 2:   #game         
             self.OnUpdate()
-        elif self.state == 3:            
+        elif self.state == 3:   #gameInit         
             self.gameInit.OnUpdate()
+        elif self.state == 4:        #automatic    
+            self.automaticPlay.OnUpdate()
+            self.OnUpdate()
+        elif self.state == 5:        #automatic    
+            self.fade.OnUpdate()
             
         self.myLeds.Send()
 #         self.DrawDebug()
 #         fps.Update()
-
+    def InitGame(self):
+        self.gameInit.Restart()
+        self.GotoState(3)
+        
     def Shoot(self, characterID : int):
         if self.state == 1:
-            self.GotoState(3)
+            self.InitGame()
+            return
+        if self.state == 4: #automatic
+            self.InitGame()
             return
         if self.enemies.state == 3:
             return
         self.audio.Fire(characterID)
+        self.DoShoot(characterID)
+        
+    def DoShoot(self, characterID : int):
         ch = self.characters[characterID - 1]
         ledID = ch.ledId
         if characterID == 1:
@@ -96,14 +120,20 @@ class BoublesGame:
         else:
             ledID += self.chararter_width
         self.shoots.AddBullet(characterID, ledID, ch.color)
-        self.ChangeColors(characterID, False)
+        self.DoChangeColors(characterID, False)
 
     def ChangeColors(self, characterID, playSound : bool ):
         if self.state == 1:
             self.GotoState(2)
             return
+        if self.state == 4:
+            self.GotoState(2)
+            return
         if self.enemies.state == 3:
-            return  
+            return 
+        self.DoChangeColors(characterID, playSound)
+        
+    def DoChangeColors(self, characterID, playSound : bool):
         color = self.characters[characterID - 1].ChangeColors()
         if(playSound):            
             self.audio.Swap(characterID, color) 
@@ -242,7 +272,20 @@ class BoublesGame:
         self.state = state
         print("New state", self.state)        
         self.audio.Stop(1)        
-        self.audio.Stop(2) 
+        self.audio.Stop(2)
+        
+    def Match(self, characterID : int):
+
+        if characterID == 1:
+            if self.characters[0].color == self.enemies.currentColor:
+                return True
+        else:
+            if self.characters[1].color == self.enemies.currentColor2:
+                return True
+        return False
+        
+        
+    
         
 
 game = BoublesGame()
