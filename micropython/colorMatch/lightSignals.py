@@ -1,37 +1,109 @@
-import time, random, machine, neopixel
+import machine
+import neopixel
+import time
+import random
 
-NUM_LEDS = 288
-PIN = 22
-np = neopixel.NeoPixel(machine.Pin(PIN), NUM_LEDS)
+class LightSignals:
+    
+    id_1 = 0
+    id_2 = 0
+    color_1 = (0,0,0)
+    color_2 = (0,0,0)
+    winColor = (100,100,100)
+    loseColor = (255,0,0)
+    offColor = (0,0,0)
+    max_late = 200
+    lateOn = False
+    boolLate = False
+    lateID = 0.0
+    lateSpeed = 0.75
+    
+    def __init__(self, pin_num=14, num_pixels=23):
+        self.num_pixels = num_pixels
+        self.pin = machine.Pin(pin_num)
+        self.strip = neopixel.NeoPixel(self.pin, self.num_pixels)
+        self.strip.write()
+            
+    def SetCharacter1(self, color):
+        self.color1 = color
+        self.id_1 = 9
+        
+    def SetCharacter2(self, color):
+        self.color2 = color 
+        self.id_2 = 9
+        
+        
+    def OnUpdateLate(self):
+        for i in range(9, 14):
+        
+            if self.lateOn == False:
+                if self.boolLate == True:
+                    self.boolLate = False
+                    self.lateID += self.lateSpeed
+                    if self.lateID>=self.max_late:
+                        self.lateOn = True
+                        self.lateID = self.max_late
+                else:
+                    self.boolLate = True
+                    
+            else:
+                if self.boolLate == True:
+                    self.boolLate = False
+                    self.lateID -= self.lateSpeed
+                    if self.lateID<=5:
+                        self.lateOn = False
+                        self.lateID = 5
+                    
+                else:
+                    self.boolLate = True
+                    
+            v = int(self.lateID)
+            self.strip[i] = (v,v,v)
+            self.strip.write()
 
-# Paleta de colores vivos (podés agregar más)
-PALETA = [
-    (255, 0, 0),     # Rojo
-    (255, 165, 0),   # Naranja
-    (255, 255, 0),   # Amarillo
-    (0, 255, 0),     # Verde
-    (0, 255, 255),   # Cian
-    (0, 0, 255),     # Azul
-    (255, 0, 255),   # Magenta
-    (255, 105, 180), # Rosa
-    (255, 255, 255)  # Blanco
-]
-
-def confeti_colores(decay=0.85, speed=0.02):
-    leds = [(0, 0, 0)] * NUM_LEDS
-    while True:
-        # Desvanecer
-        for i in range(NUM_LEDS):
-            leds[i] = tuple(int(c * decay) for c in leds[i])
-        # Crear varios destellos nuevos por frame
-        for _ in range(5):  # Cantidad de nuevos destellos por frame
-            pos = random.randint(0, NUM_LEDS - 1)
-            color = random.choice(PALETA)
-            leds[pos] = color
-        # Mostrar
-        for i in range(NUM_LEDS):
-            np[i] = leds[i]
-        np.write()
-        time.sleep(speed)
-
-confeti_colores()
+    def OnUpdate(self):
+    
+        if self.id_1>0:
+            self.strip[self.id_1] = self.color1
+            self.strip.write()
+            self.id_1 = self.id_1-1
+        if self.id_2>0:
+            self.strip[13+self.id_2] = self.color2
+            self.strip.write()
+            self.id_2 = self.id_2-1
+            
+            
+    def GameIntro(self):
+        
+        for i in range(0, 9):
+            self.strip[i] = self.winColor
+        for i in range(14, 23):
+            self.strip[i] = self.winColor
+                
+        self.strip.write()
+            
+            
+    def Win(self, ch):
+        
+        for i in range(0, 9):
+            if ch==1:
+                self.strip[i] = self.winColor
+            else:
+                self.strip[i] = self.loseColor
+        for i in range(14, 23):
+            if ch==1:
+                self.strip[i] = self.loseColor
+            else:
+                self.strip[i] = self.winColor
+                
+        self.strip.write()
+        
+    def Off(self):
+        
+        for i in range(0, 9):
+            self.strip[i] = self.offColor
+        for i in range(14, 23):
+            self.strip[i] = self.offColor
+                
+        self.strip.write()
+        

@@ -4,7 +4,7 @@ import array
 
 class Leds:
     
-    PIN_NUM = 22
+    PIN_NUM = 15
     NUM_LEDS = 300
 
     @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=24)

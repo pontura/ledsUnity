@@ -6,30 +6,31 @@ class GameInit:
     global game
     numpix = 300
     ledID = 0
+    speed = 0.5
 
     def Init(self, game, numpix):
         self.numpix = numpix
-        self.game = game
-        for l in range(self.numpix):
-            self.game.SetLed(l, 0)
+        self.game = game        
             
     def Restart(self):
+        for l in range(self.numpix):
+            self.game.SetLedAlpha(l, 10, 0.1)
         self.ledID = 0
         
     def OnUpdate(self):        
         #RESET
-        l1 = self.ledID
+        l1 = int(self.ledID)
         self.game.SetLed(l1, 0)
-        l2 = self.numpix-self.ledID-1
+        l2 = self.numpix-int(self.ledID)-1
         self.game.SetLed(l2, 0)
         
-        self.ledID = self.ledID +1
-        if self.ledID >=self.numpix/2:
-            self.Restart()
+        self.ledID = self.ledID +self.speed
+        led = int(self.ledID +self.speed)
+        if led >=self.numpix/2:
             self.game.GotoState(2)
         else:        
-            l1 = self.ledID
+            l1 = led
             self.game.SetLed(l1, 10)
-            l2 = self.numpix-self.ledID-1
+            l2 = self.numpix-led-1
             self.game.SetLed(l2, 10)
 

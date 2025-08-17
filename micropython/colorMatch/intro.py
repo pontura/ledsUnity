@@ -15,6 +15,7 @@ class Intro:
     num_flashes = 10
     
     timer = 0
+    timerToAutomaticPlay = 50
 
     
         
@@ -29,9 +30,10 @@ class Intro:
         
     def OnUpdate(self):
         self.timer = self.timer + 1
-        if self.timer>2:
+        print (self.timer)
+        if self.timer>self.timerToAutomaticPlay:
             self.timer = 0
-            self.game.Fade(4)
+            self.game.Fade(4, 2)
         else:
             for i in range(self.num_flashes):
 
@@ -47,5 +49,6 @@ class Intro:
                     flash_len = random.randint(self.min_len, self.max_len)
                     self.flashing[i] = [pix, col, flash_len, 0, 1]
                 self.flashing[i][3] = self.flashing[i][3] + self.flashing[i][4]
-                time.sleep(0.005)
+                time.sleep(0.002)
+
 

@@ -9,8 +9,8 @@ class Audio:
         a1 = audioSource.AudioSource()
         a2 = audioSource.AudioSource()
         
-        a1.SetPin(self, 1, 1)
-        a2.SetPin(self, 0, 2)
+        a1.SetPin(self, 0, 1)
+        a2.SetPin(self, 1, 2)
 
         self.a.append(a1)
         self.a.append(a2)   
@@ -27,7 +27,7 @@ class Audio:
     def Fire(self, ch : int):
         self.Play(2, 0.4, ch)
         
-    def Swap(self, ch : int):
+    def Swap(self, ch : int, color : int):
         self.Play(3, 0.1, ch)
         
     def Explote(self, ch : int):

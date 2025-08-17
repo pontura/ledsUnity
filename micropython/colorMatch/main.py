@@ -7,11 +7,11 @@ import intro, gameInit, fade
 import automaticPlay
             
 class BoublesGame:
-    numLeds = 288
+    numLeds = 300
 #     numLeds = 150
     chararter_width = 9
     myLeds = leds.Leds()
-    lightSignals = lightSignals.LightSignals(1, 23)
+    lightSignals = lightSignals.LightSignals(14, 23)
     
     myLeds.Init(numLeds)
     audio = audio.Audio()
@@ -97,6 +97,7 @@ class BoublesGame:
 #         self.DrawDebug()
 #         fps.Update()
     def InitGame(self):
+        self.lightSignals.GameIntro()
         self.gameInit.Restart()
         self.GotoState(3)
         
@@ -139,6 +140,7 @@ class BoublesGame:
             self.audio.Swap(characterID, color) 
 
     def Win(self, ch):
+        self.lightSignals.Win(ch)
         self.wonCh = ch
         self.enemies.GameOver(ch)
         self.timer = 0
@@ -273,6 +275,8 @@ class BoublesGame:
         print("New state", self.state)        
         self.audio.Stop(1)        
         self.audio.Stop(2)
+        if state == 1:
+            self.lightSignals.Off()
         
     def Match(self, characterID : int):
 
@@ -291,13 +295,13 @@ class BoublesGame:
 game = BoublesGame()
 game.Start()
 
-ch1_b1 = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP )
+ch1_b1 = machine.Pin(12, machine.Pin.IN, machine.Pin.PULL_UP )
 ch1_b1_pressed = False
-ch2_b1 = machine.Pin(7, machine.Pin.IN, machine.Pin.PULL_UP )
+ch2_b1 = machine.Pin(19, machine.Pin.IN, machine.Pin.PULL_UP )
 ch2_b1_pressed = False
-ch1_b2 = machine.Pin(14, machine.Pin.IN, machine.Pin.PULL_UP )
+ch1_b2 = machine.Pin(9, machine.Pin.IN, machine.Pin.PULL_UP )
 ch1_b2_pressed = False
-ch2_b2 = machine.Pin(6, machine.Pin.IN, machine.Pin.PULL_UP )
+ch2_b2 = machine.Pin(22, machine.Pin.IN, machine.Pin.PULL_UP )
 ch2_b2_pressed = False
 
 # fps = FPS.fps()
