@@ -77,7 +77,7 @@ class Enemies:
         for colorID in self.data:                
             ledID = ledId + centerLedID+2
             if ledID > self.numLeds - self.chararter_width:
-                self.game.Win(1)
+                self.game.Win(2)
                 return
             self.SetLed(ledID, colorID)
 #             self.game.ledsData[ledID] = c
@@ -87,7 +87,7 @@ class Enemies:
         for colorID in self.data2:                
             ledID = centerLedID - ledId-2
             if ledID < self.chararter_width:
-                self.game.Win(2)
+                self.game.Win(1)
                 return
             self.SetLed(ledID, colorID)
 #             self.game.ledsData[ledID] = c

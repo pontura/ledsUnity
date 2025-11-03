@@ -75,22 +75,26 @@ class BoublesGame:
         self.Fade(1, 10)
         
     def Fade(self, gotoNext, color):
-        self.GotoState(5)
         self.fade.InitFade(gotoNext, color)
+        self.GotoState(5)
+        
         
     def Update(self):
         if self.state == 1: #intro
-            self.intro.OnUpdate()
+            self.intro.OnUpdate(self.deltaTime)
             self.lightSignals.Late() 
+            self.audio.OnUpdate(self.deltaTime)
         elif self.state == 2:   #game         
             self.OnUpdate()
         elif self.state == 3:   #gameInit         
             self.gameInit.OnUpdate()
+            self.audio.OnUpdate(self.deltaTime)
         elif self.state == 4:        #automatic    
             self.automaticPlay.OnUpdate()
             self.OnUpdate()
         elif self.state == 5:        #fade    
             self.fade.OnUpdate()
+            self.audio.OnUpdate(self.deltaTime)
             
         self.myLeds.Send()
 #         self.DrawDebug()
@@ -139,7 +143,10 @@ class BoublesGame:
             self.audio.Swap(characterID, color) 
 
     def Win(self, ch):
-        self.lightSignals.Win(ch)
+        if ch == 1:
+            self.lightSignals.Win(2)
+        else:
+            self.lightSignals.Win(1)
         self.wonCh = ch
         self.enemies.GameOver(ch)
         self.timer = 0
@@ -270,12 +277,14 @@ class BoublesGame:
         
     def GotoState(self, state : int):
         self.Restart()
-        self.state = state
-        print("New state", self.state)        
         self.audio.Stop(1)        
-        self.audio.Stop(2)
+        self.audio.Stop(2)     
+        self.audio.OnUpdate(self.deltaTime)
+        self.state = state
+        print("New state", self.state)    
         if state == 1:
             self.lightSignals.Off()
+                
             
         
     def Match(self, characterID : int):

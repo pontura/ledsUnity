@@ -166,4 +166,5 @@ class AudioSource:
         self.buzzer.freq(int(frequency))
 
     def be_quiet(self):
+        self.clip = 0
         self.buzzer.duty_u16(0)
