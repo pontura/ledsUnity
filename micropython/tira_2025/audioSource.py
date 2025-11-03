@@ -33,10 +33,10 @@ class AudioSource:
         elif clip == 3:
             self.swapValue = 0
             self.Swap_init()
-        elif clip == 6:
-            self.swapValue = 1
-            self.Swap_init()
-            self.clip = 3
+        #elif clip == 6:
+            #self.swapValue = 1
+            #self.Swap_init()
+            #self.clip = 6
         elif clip == 7:
             self.swapValue = 2
             self.Swap_init()

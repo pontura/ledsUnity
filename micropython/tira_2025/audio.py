@@ -28,7 +28,6 @@ class Audio:
         self.Play(2, 0.4, ch)
         
     def Swap(self, ch : int, color : int):
-        print(color)
         if color ==1:
             self.Play(3, 0.1, ch)
         elif color ==2:
@@ -50,7 +49,7 @@ class Audio:
         self.a[ch-1].Play(clip, dur)       
         
             
-    def OnUpdate(self, deltaTime):        
+    def OnUpdate(self, deltaTime):
         self.a[0].OnUpdate(deltaTime)
         self.a[1].OnUpdate(deltaTime)
     

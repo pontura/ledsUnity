@@ -81,20 +81,16 @@ class BoublesGame:
     def Update(self):
         if self.state == 1: #intro
             self.intro.OnUpdate()
-            self.lightSignals.Late()
-            self.audio.OnUpdate(self.deltaTime)
+            self.lightSignals.Late() 
         elif self.state == 2:   #game         
             self.OnUpdate()
-            self.audio.OnUpdate(self.deltaTime)
         elif self.state == 3:   #gameInit         
             self.gameInit.OnUpdate()
-            self.audio.OnUpdate(self.deltaTime)
         elif self.state == 4:        #automatic    
             self.automaticPlay.OnUpdate()
             self.OnUpdate()
         elif self.state == 5:        #fade    
             self.fade.OnUpdate()
-            self.audio.OnUpdate(self.deltaTime)
             
         self.myLeds.Send()
 #         self.DrawDebug()
@@ -175,6 +171,8 @@ class BoublesGame:
     def OnUpdate(self):
          
         self.UpdateCenter(self.deltaTime)
+        if self.state != 4:
+            self.audio.OnUpdate(self.deltaTime)
         
         self.seconds += self.deltaTime
         self.timer += self.deltaTime
