@@ -3,17 +3,10 @@ import time
 import character, shoots, enemies, audio, lightSignals
 # import FPS
 import leds
-import intro, gameInit, fade, summary
+import intro, gameInit, fade
 import automaticPlay
             
 class BoublesGame:
-    
-    
-    
-
-
-
-
     numLeds = 300
     chararter_width = 9
     myLeds = leds.Leds()
@@ -22,8 +15,6 @@ class BoublesGame:
     myLeds.Init(numLeds)
     audio = audio.Audio()
     intro = intro.Intro()
-    summary = summary.Summary()
-
     automaticPlay = automaticPlay.AutomaticPlay()
     gameInit = gameInit.GameInit()
     fade = fade.Fade()
@@ -37,6 +28,9 @@ class BoublesGame:
         self.delayToAdd = 0.4
         self.minDelayToAdd = 0.04
         self.speed = 0.001
+#         self.delayToAdd = 0.1
+#         self.minDelayToAdd = 0.002
+#         self.speed = 0.1
         self.timeToAddColor = 25
         self.totalColors = 3
         self.seconds = 0
@@ -52,7 +46,6 @@ class BoublesGame:
         #self.enemies.Init(self, self.chararter_width, self.numLeds)
         self.enemies.Init(self, 0, self.numLeds)
         
-        self.summary.Init(self, self.numLeds)
         self.intro.Init(self, self.numLeds)
         self.gameInit.Init(self, self.numLeds)
         self.automaticPlay.Init(self)
@@ -101,9 +94,6 @@ class BoublesGame:
             self.OnUpdate()
         elif self.state == 5:        #fade    
             self.fade.OnUpdate()
-            self.audio.OnUpdate(self.deltaTime)
-        elif self.state == 6:        #summary    
-            self.summary.OnUpdate(self.deltaTime)
             self.audio.OnUpdate(self.deltaTime)
             
         self.myLeds.Send()
@@ -295,12 +285,7 @@ class BoublesGame:
         if state == 1:
             self.lightSignals.Off()
                 
-    def Summary(self, ch):
-        self.summary.play_victory(ch)
-        self.GotoState(6) #intro 
-        
-    def PlayIntro(self):
-        self.GotoState(1) #intro 
+            
         
     def Match(self, characterID : int):
 

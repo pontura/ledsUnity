@@ -72,8 +72,6 @@ class AudioSource:
             self.Wrong()
         elif self.clip == 6:
             self.LoopNote(self.note)
-        elif self.clip == 7:
-            self.play_victory()
         
     def Stop(self):
         self.timer = 0
@@ -170,4 +168,3 @@ class AudioSource:
     def be_quiet(self):
         self.clip = 0
         self.buzzer.duty_u16(0)
-

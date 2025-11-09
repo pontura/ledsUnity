@@ -1,7 +1,6 @@
 from machine import Pin
 import rp2
 import array
-import neopixel
 
 class Leds:
     

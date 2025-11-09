@@ -256,7 +256,7 @@ class Enemies:
                 self.data.pop()
                               
             if len(self.data2) <= 0 and len(self.data) <= 0:
-                self.game.Summary(ch)
+                self.game.GotoState(1) #intro
                 return  
             
         self.deadTimer += deltaTime
