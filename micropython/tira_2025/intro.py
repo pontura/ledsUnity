@@ -15,7 +15,7 @@ class Intro:
     num_flashes = 10
     
     timer = 0
-    timerToAutomaticPlay = 10
+    timerToAutomaticPlay = 11
 
     v = 0.05
         
@@ -23,6 +23,8 @@ class Intro:
     def Init(self, game, numpix):
         self.numpix = numpix
         self.game = game
+        self.v = 0.05
+        self.timer = 0
         for i in range(self.num_flashes):
             self.pix = random.randint(0, numpix - 1)
             flash_len = random.randint(self.min_len, self.max_len)
@@ -31,6 +33,7 @@ class Intro:
         
     def OnUpdate(self, deltaTime):
         self.timer = self.timer + deltaTime
+        
         if self.timer>self.timerToAutomaticPlay:
                   
             self.v = 0.05
@@ -53,7 +56,8 @@ class Intro:
                 self.flashing[i][3] = self.flashing[i][3] + self.flashing[i][4]
                 time.sleep(0.002)
                 
-                self.v = self.v + 0.005
+            self.v = self.v + 0.05
+            if self.v<0.7:
                 self.game.LoopNote(self.v, 1)
 
 

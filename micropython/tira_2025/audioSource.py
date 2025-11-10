@@ -31,18 +31,18 @@ class AudioSource:
         elif clip == 2:
             self.Fire_init()
         elif clip == 3:
-            self.swapValue = 0
+            self.swapValue = 1
             self.Swap_init()
-        #elif clip == 6:
-            #self.swapValue = 1
-            #self.Swap_init()
-            #self.clip = 6
-        elif clip == 7:
+        elif clip == 6:
             self.swapValue = 2
+            self.Swap_init()
+            self.clip = 6
+        elif clip == 7:
+            self.swapValue = 3
             self.Swap_init()
             self.clip = 3
         elif clip == 8:
-            self.swapValue = 3
+            self.swapValue = 4
             self.Swap_init()
             self.clip = 3
         elif clip == 9:
@@ -124,17 +124,17 @@ class AudioSource:
         self.start_value = 1000
         self.clipState  =0
     def Swap(self):
-        v = 1
+        v = 0.2
         f = 5000
         if self.timer < 0.02:
             f = self.start_value - (self.timer*2400)
         elif self.clipState == 0:
             self.start_value = 500
             self.clipState = 1
-            v = 0.7
+            v = 0.2
         else:            
             f = self.start_value + (self.timer*1000)
-            v = 0.7-(self.timer*1.7)            
+            v = 0.2-(self.timer*1.7)            
         if f<100:
             f = 100
         elif f>60000:

@@ -7,13 +7,6 @@ import intro, gameInit, fade, summary
 import automaticPlay
             
 class BoublesGame:
-    
-    
-    
-
-
-
-
     numLeds = 300
     chararter_width = 9
     myLeds = leds.Leds()
@@ -31,7 +24,7 @@ class BoublesGame:
     wonCh = 0
     deltaTime = 0.03
     centerColor = 0
-    state = 5 #1=intro 2=game 5=fade
+    state = 5 #1=intro   2=game   3=gamePresentation   4=automatic   5=fade   6=summary
     
     def Init(self):
         self.delayToAdd = 0.4
@@ -110,6 +103,7 @@ class BoublesGame:
 #         self.DrawDebug()
 #         fps.Update()
     def InitGame(self):
+        self.totalColors = 3
         self.lightSignals.White()
         self.gameInit.Restart()
         self.GotoState(3)
@@ -122,6 +116,8 @@ class BoublesGame:
             self.InitGame()
             return
         if self.enemies.state == 3:
+            return
+        if self.state == 3 or self.state == 5 or self.state ==6:
             return
         self.audio.Fire(characterID)
         self.DoShoot(characterID)
@@ -137,6 +133,8 @@ class BoublesGame:
         self.DoChangeColors(characterID, False)
 
     def ChangeColors(self, characterID, playSound : bool ):
+        if self.state == 3 or self.state == 5 or self.state ==6:
+            return
         if self.state == 1:
             self.InitGame()
             return
@@ -144,7 +142,7 @@ class BoublesGame:
             self.InitGame()
             return
         if self.enemies.state == 3:
-            return 
+            return
         self.DoChangeColors(characterID, playSound)
         
     def DoChangeColors(self, characterID, playSound : bool):

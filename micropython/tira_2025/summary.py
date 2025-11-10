@@ -17,6 +17,7 @@ class Summary:
     noiseLedID = 0
     playerID = 0
     done = False
+    ending = False
     
     def Init(self, game, num_leds):
         self.game = game
@@ -48,6 +49,30 @@ class Summary:
             
     def OnUpdate(self, deltaTime):
         
+        if self.done ==True:
+            if self.ending == True:
+                self.v = self.v
+            elif urandom.randint(1, 10)>3:
+                self.v = self.v - 0.02
+            else:
+                self.v = self.v + 0.01
+        else:
+            if urandom.randint(1, 10)>3:
+                self.v = self.v + 0.01
+            else:
+                self.v = self.v - 0.02
+        
+        if self.v<0.001:
+            self.v = 0.001
+            
+        self.game.LoopNote(self.v, self.playerID)
+        
+        
+        if self.ending == True:
+            self.timer = self.timer + deltaTime
+            if self.timer>6:
+                self.ending = False
+            return
         self.ledID = self.ledID +1
         if self.ledID<int(self.num_leds/2)-1:
             if self.done == True:                
@@ -62,31 +87,16 @@ class Summary:
                 self.End()
             else:
                 for led_id in self.led_ids:
-                    
+                    self.ending = True                    
                     self.v = 1
                     self.done = True
                     self.ledID = 0
                     self.game.SetLedAlpha(led_id, 10, 0.5)
-            
-        self.timer = self.timer + deltaTime
-        if self.note>2:
-            self.v = self.v - 0.01
-        else:
-            if urandom.randint(1, 10)>3:
-                self.v = self.v + 0.01
-            else:
-                self.v = self.v - 0.02
-            if self.timer > self.note_duration:
-                self.PlayNote()
-                
-        self.game.LoopNote(self.v, 1)
+        
             
         
 
             
-    def PlayNote(self):
-        self.note = self.note +1
-        self.timer = 0
         
         
     def End(self):            

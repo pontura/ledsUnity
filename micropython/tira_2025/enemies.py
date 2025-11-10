@@ -33,9 +33,13 @@ class Enemies:
         self.numLeds = numLeds
 
     def Restart(self):
+        self.bbw_ch1 = 0
+        self.bbw_ch2 = 0
+        self.currentColor = urandom.randint(1, 3)
+        self.currentColor2 = urandom.randint(1, 3)
         self.state = 0
-        self.data.clear()
-        self.data2.clear()
+        self.data = []
+        self.data2 = []
 
     def UpdateDraw(self, ch, centerLedID):
         self.centerLedID = centerLedID
@@ -281,11 +285,11 @@ class Enemies:
             self.deadTimer = 0
             
     def SetLed(self, l : int, c: int):
-        if l > 0 and l < self.numLeds:
+        if l >= 0 and l < self.numLeds:
             self.game.SetLed(l,c)
             
     def SetLed2(self, l : int, c: int):
-        if l > 0 and l < self.numLeds:
+        if l >= 0 and l < self.numLeds:
             self.game.SetLed2(l,c)
         
     def PlayLoopDeath(self, on : bool):

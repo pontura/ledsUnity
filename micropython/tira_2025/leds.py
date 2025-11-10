@@ -74,15 +74,15 @@ class Leds:
         self.green = self.CreateColor(self.GREEN)
         self.blue = self.CreateColor(self.BLUE)
         self.yellow = self.CreateColor(self.YELLOW)
-        self.cyan = self.CreateColor(self.CYAN)
         self.magenta = self.CreateColor(self.MAGENTA)
+        self.cyan = self.CreateColor(self.CYAN)
         
         self.red2 = self.CreateColor(self.RED2)
         self.green2 = self.CreateColor(self.GREEN2)
         self.blue2 = self.CreateColor(self.BLUE2)
         self.yellow2 = self.CreateColor(self.YELLOW2)
-        self.cyan2 = self.CreateColor(self.CYAN2)
         self.magenta2 = self.CreateColor(self.MAGENTA2)
+        self.cyan2 = self.CreateColor(self.CYAN2)
         
         for a in range(self.NUM_LEDS):
             self.dimmer_ar[a] = self.bgColor
@@ -105,10 +105,10 @@ class Leds:
         elif c == self.blue:
             return "3"
         elif c == self.yellow:
-            return "4"
-        elif c == self.cyan:
-            return "5"
+            return "4"        
         elif c == self.magenta:
+            return "5"
+        elif c == self.cyan:
             return "6"
         return "x"
       
@@ -138,11 +138,11 @@ class Leds:
         elif colorID == 3:
             c = self.BLUE
         elif colorID == 4:
-            c = self.YELLOW
+            c = self.YELLOW            
         elif colorID == 5:
-            c = self.CYAN
-        elif colorID == 6:
             c = self.MAGENTA
+        elif colorID == 6:
+            c = self.CYAN
         return c
     
     @micropython.viper 
@@ -159,11 +159,11 @@ class Leds:
         elif colorID == 3:
             c = self.blue
         elif colorID == 4:
-            c = self.yellow
+            c = self.yellow            
         elif colorID == 5:
-            c = self.cyan
-        elif colorID == 6:
             c = self.magenta
+        elif colorID == 6:
+            c = self.cyan
         return c
     
     @micropython.viper 
@@ -180,11 +180,11 @@ class Leds:
         elif colorID == 3:
             c = self.blue2
         elif colorID == 4:
-            c = self.yellow2
+            c = self.yellow2            
         elif colorID == 5:
-            c = self.cyan2
-        elif colorID == 6:
             c = self.magenta2
+        elif colorID == 6:
+            c = self.cyan2
         return c
     
    
