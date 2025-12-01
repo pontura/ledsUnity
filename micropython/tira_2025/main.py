@@ -35,9 +35,10 @@ class BoublesGame:
         self.seconds = 0
         self.timer = 0
         self.centerLedID = self.numLeds // 2
-        self.audio.Init()
+        
 
     def Start(self):
+        self.audio.Init()
         self.Init()
         self.colors = [1,2,3,4,5,6]
         self.enemies = enemies.Enemies()
